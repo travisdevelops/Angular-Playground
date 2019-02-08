@@ -1,0 +1,29 @@
+<div class="row p-2 mb-3">
+    <div class="col-3">
+      <span class="calender-nav-button previous" (click)="calendar.prevMonth()">&larr; Prev</span>
+    </div>
+    <div class="col-6 text-center">
+      <span class="calendar-title">{{calendar.month}} {{calendar.year}}</span>
+    </div>
+    <div class="col-3 text-right">
+      <span class="calender-nav-button next" (click)="calendar.nextMonth()">Next &rarr;</span>
+      </div>
+</div>
+  
+<table class="table table-bordered table-striped calendar-table">
+  <thead>
+    <tr>
+      <td *ngFor="let day of calendarClass.daysOfWeek">{{day}}</td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let week of calendar.weeks">
+      <td *ngFor="let day of week" [ngClass]="{'current' : day.currentMonth}">{{day.day}}
+      <ng-container *ngFor="let event of day.events; index as i;">
+        <span [style.background-color]="'rgb('+event.color.x+','+event.color.y+','+event.color.z+')'" *ngIf="day.events.length <= 4 || (day.events.length > 4 && i < 3)">{{event.title}}</span>
+      </ng-container>
+        <span *ngIf="day.events.length > 4" class="additional-events">View +{{day.events.length - 3}} More Events</span>
+      </td>
+    </tr>
+  </tbody>
+</table>

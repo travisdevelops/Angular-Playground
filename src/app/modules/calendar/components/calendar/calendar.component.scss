@@ -1,0 +1,82 @@
+@import '/~src/styles';
+
+:host{
+  display: block;
+  padding: 20px 10px;
+  height: calc(100% - 70px);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.calender-nav-button{
+    padding: 5px 10px;
+    border-radius: 20px;
+    border: 1px solid;
+    cursor:pointer;
+    transition: background-color 0.3s;
+    @include themes() {
+        color: theme(buttonTextColor);  
+        border-color: theme(buttonTextColor); 
+        background-color: theme(buttonBGColor);
+    }
+    
+    &:hover{
+      @include themes() {
+          color: theme(buttonTextHoverColor);  
+          border-color: theme(buttonBGHoverColor); 
+          background-color: theme(buttonBGHoverColor); 
+      }
+    }
+    
+    &.previous{
+        border-bottom-right-radius: 0;
+    }
+    
+    &.next{
+      border-bottom-left-radius: 0;
+  }
+}
+    
+.calendar-title{
+      border-color: transparent;
+      font-weight: bold;
+      font-size: 30px;
+      line-height: 20px;
+      @include themes() {
+        color: theme(textColor) !important;   
+      }
+    }
+    
+.calendar-table{
+      table-layout:fixed;
+      
+      td {
+        @include themes() {
+            color: theme(textColor);  
+        }
+      }
+    tbody td{
+      height:140px;
+      min-width:115px;
+      
+      &:not(.current){
+        color:#aaa;
+      }
+      
+      span{
+        display:block;
+        margin:3px -12px;
+        padding:2px 8px;
+        font-size:13px;
+        white-space:nowrap;
+        overflow:hidden;
+        text-overflow: ellipsis;
+      } 
+      
+      .additional-events{
+        background-color:#bbb;
+      }
+    }
+    
+
+    }

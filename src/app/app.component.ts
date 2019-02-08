@@ -1,4 +1,7 @@
 import { Component } from '@angular/core';
+import { NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import { PlaygroundPickerComponent } from './components/playground-picker/playground-picker.component';
+import { Theme } from './classes/theme';
 
 @Component({
   selector: 'app-root',
@@ -6,5 +9,17 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'angular-playground';
+  public Theme: any;
+
+  constructor(private modalService: NgbModal) {
+    this.Theme = Theme;
+    Theme.init();
+  }
+
+  // Open Playground Picker As A Modal Window
+  openPlaygroundPicker() {
+    this.modalService.open(PlaygroundPickerComponent).result.then((closed) => {
+    }, (dismissed) => {
+    });
+  }
 }
