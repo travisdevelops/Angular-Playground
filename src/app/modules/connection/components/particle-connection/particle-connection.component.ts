@@ -1,8 +1,8 @@
 import {Component, OnInit, OnDestroy} from '@angular/core';
 import {Particle} from '../../classes/particle';
-import {Vector} from '@app/classes/vector';
-import {Theme} from '@app/classes/theme';
-import {Sketch} from '@app/classes/sketch';
+import {Vector} from '@classes/vector';
+import {Theme} from '@classes/theme';
+import {Sketch} from '@classes/sketch';
 
 let _self: ParticleConnectionComponent;
 declare let p5: any;

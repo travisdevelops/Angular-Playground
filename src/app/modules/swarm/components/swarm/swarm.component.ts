@@ -1,8 +1,8 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import { CoreManager } from '../../classes/coremanager';
-import { Vector } from '@app/classes/vector';
-import { Theme } from '@app/classes/theme';
-import { Sketch } from '@app/classes/sketch';
+import { Vector } from '@classes/vector';
+import { Theme } from '@classes/theme';
+import { Sketch } from '@classes/sketch';
 let _self: SwarmComponent;
 declare let p5: any;
 

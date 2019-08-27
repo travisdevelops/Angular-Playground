@@ -1,6 +1,6 @@
-import { Vector } from '@app/classes/vector';
-import { Helper } from '@app/classes/helper';
-import { CanvasObject } from '@app/classes/canvas-object';
+import { Vector } from '@classes/vector';
+import { Helper } from '@classes/helper';
+import { CanvasObject } from '@classes/canvas-object';
 import { Emission } from './emission';
 
 export class Emitter extends CanvasObject {

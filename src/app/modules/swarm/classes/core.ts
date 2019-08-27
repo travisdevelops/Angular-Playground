@@ -1,8 +1,8 @@
-import {Vector} from '@app/classes/vector';
-import {CanvasObject} from '@app/classes/canvas-object';
+import {Vector} from '@classes/vector';
+import {CanvasObject} from '@classes/canvas-object';
 import {Strand} from './strand';
-import {Sketch} from '@app/classes/sketch';
-import {Theme} from '@app/classes/theme';
+import {Sketch} from '@classes/sketch';
+import {Theme} from '@classes/theme';
 
 export class Core extends CanvasObject {
   public strands: Strand[];

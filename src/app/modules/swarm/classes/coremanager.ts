@@ -1,6 +1,6 @@
-import {Vector} from '@app/classes/vector';
+import {Vector} from '@classes/vector';
 import {Core} from './core';
-import {Sketch} from '@app/classes/sketch';
+import {Sketch} from '@classes/sketch';
 
 export class CoreManager {
 

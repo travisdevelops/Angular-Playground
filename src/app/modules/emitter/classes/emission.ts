@@ -1,8 +1,8 @@
-import { Vector } from '@app/classes/vector';
-import { Helper } from '@app/classes/helper';
-import { Theme } from '@app/classes/theme';
-import { CanvasObject } from '@app/classes/canvas-object';
-import { Sketch } from '@app/classes/sketch';
+import { Vector } from '@classes/vector';
+import { Helper } from '@classes/helper';
+import { Theme } from '@classes/theme';
+import { CanvasObject } from '@classes/canvas-object';
+import { Sketch } from '@classes/sketch';
 
 export class Emission extends CanvasObject {
     public objectOrigin: CanvasObject;

@@ -1,6 +1,6 @@
-import {Vector} from '@app/classes/vector';
-import {CanvasObject} from '@app/classes/canvas-object';
-import {Sketch} from '@app/classes/sketch';
+import {Vector} from '@classes/vector';
+import {CanvasObject} from '@classes/canvas-object';
+import {Sketch} from '@classes/sketch';
 
 export class Strand extends CanvasObject {
   private tails: Vector[];

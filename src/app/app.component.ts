@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import { PlaygroundPickerComponent } from './components/playground-picker/playground-picker.component';
-import { Theme } from './classes/theme';
+import { Theme } from '@classes/theme';
 
 @Component({
   selector: 'app-root',

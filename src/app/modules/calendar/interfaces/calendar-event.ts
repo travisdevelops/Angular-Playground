@@ -1,4 +1,4 @@
-import { Vector } from '../../classes/vector';
+import { Vector } from '@classes/vector';
 
 export interface CalendarEvent {
     startDate: Date;
