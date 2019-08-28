@@ -5,19 +5,14 @@ import { Emission } from './emission';
 
 export class Emitter extends CanvasObject {
     public emissions: Emission[];
-    public emissionCount: number;
+    public emissionCount = 300;
     public active: boolean;
 
-    constructor({position = new Vector(), emissionCount = 0} = {}) {
+    constructor({position = new Vector(), emissionCount = 300} = {}) {
         super({position: position});
         this.emissions = [];
         this.emissionCount = emissionCount;
         this.active = false;
-    }
-
-    // Set New Count Of Emissions
-    setEmissionsCount(emissionCount: number): void {
-        this.emissionCount = emissionCount;
     }
 
     // Add Emissions

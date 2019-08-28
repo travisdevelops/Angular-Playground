@@ -1,15 +1,20 @@
-<div class="modal-content">
-  <div class="modal-header">
-    <h5 class="modal-title">Playground Picker</h5>
-    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  <div class="modal-body">
-    Choose Angular App <br/>
-    <button class="btn btn-dark" routerLink="/connection" (click)="modal.dismiss('App Selected')">Particle Connections</button> |
-    <button class="btn btn-dark" routerLink="/calendar" (click)="modal.dismiss('App Selected')">Calendar</button> |
-    <button class="btn btn-dark" routerLink="/emitter" (click)="modal.dismiss('App Selected')">Particle Emitter</button> |
-    <button class="btn btn-dark" routerLink="/swarm" (click)="modal.dismiss('App Selected')">Swarm</button>
+<div class="modal-dialog modal-lg">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">Playground Picker</h5>
+      <button type="button" class="close" aria-label="Close" data-dismiss="modal">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body text-center">
+      <h3>Choose Angular App</h3>
+      <div class="mt-4 mb-3">
+        <button class="btn btn-dark" routerLink="/" data-dismiss="modal">Home</button> |
+        <button class="btn btn-dark" routerLink="/connection" data-dismiss="modal">Particle Connections</button> |
+        <button class="btn btn-dark" routerLink="/calendar" data-dismiss="modal">Calendar</button> |
+        <button class="btn btn-dark" routerLink="/emitter" data-dismiss="modal">Particle Emitter</button> |
+        <button class="btn btn-dark" routerLink="/swarm" data-dismiss="modal">Swarm</button>
+      </div>
+    </div>
   </div>
 </div>

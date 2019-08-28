@@ -18,7 +18,7 @@
   </thead>
   <tbody>
     <tr *ngFor="let week of calendar.weeks">
-      <td *ngFor="let day of week" [ngClass]="{'current' : day.currentMonth}">{{day.day}}
+      <td *ngFor="let day of week" [ngClass]="{'selected-month' : day.selectedMonth, 'current-day' : day.currentMonth && day.currentDay }">{{day.day}}
       <ng-container *ngFor="let event of day.events; index as i;">
         <span [style.background-color]="'rgb('+event.color.x+','+event.color.y+','+event.color.z+')'" *ngIf="day.events.length <= 4 || (day.events.length > 4 && i < 3)">{{event.title}}</span>
       </ng-container>

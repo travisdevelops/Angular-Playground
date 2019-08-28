@@ -62,8 +62,9 @@ export class CoreManager {
     }
     if (outsideCoreCount === this.cores.length) {// Outside All Cores
       if (core.movable) {// Core Was Moving Which Is Why Its Outside So Return To Home Core
+        strand.tails = [];
         strand.position = core.getPositionInsideCore();
-      } else { strand.randomizeSpeed(); }// TODO : FIX CODE - BUGGY SHOULD ONLY DO IF MOVEMENT OF MOUSE SPEED IS HIGH
+      } else { strand.randomizeSpeed(); }
     }
   }
 

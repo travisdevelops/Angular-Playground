@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
-import { NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {Component, ComponentFactoryResolver, ViewChild, ViewContainerRef} from '@angular/core';
 import { PlaygroundPickerComponent } from './components/playground-picker/playground-picker.component';
 import { Theme } from '@classes/theme';
+import { ModalComponent } from '@app/components/modal/modal.component';
 
 @Component({
   selector: 'app-root',
@@ -10,16 +10,18 @@ import { Theme } from '@classes/theme';
 })
 export class AppComponent {
   public Theme: any;
+  @ViewChild('modalContainer', { read: ViewContainerRef, static: false }) modalContainer: ViewContainerRef;
 
-  constructor(private modalService: NgbModal) {
+  constructor(private resolver: ComponentFactoryResolver) {
     this.Theme = Theme;
     Theme.init();
   }
 
   // Open Playground Picker As A Modal Window
   openPlaygroundPicker() {
-    this.modalService.open(PlaygroundPickerComponent).result.then((closed) => {
-    }, (dismissed) => {
-    });
+    const factory = this.resolver.resolveComponentFactory(ModalComponent);
+    const componentRef = this.modalContainer.createComponent(factory);
+    componentRef.instance.modalComponent = PlaygroundPickerComponent;
+    componentRef.instance.componentRef = componentRef;
   }
 }

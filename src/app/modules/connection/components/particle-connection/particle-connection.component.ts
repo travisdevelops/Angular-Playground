@@ -3,9 +3,9 @@ import {Particle} from '../../classes/particle';
 import {Vector} from '@classes/vector';
 import {Theme} from '@classes/theme';
 import {Sketch} from '@classes/sketch';
+import p5 from 'p5';
 
 let _self: ParticleConnectionComponent;
-declare let p5: any;
 
 @Component({
   selector: 'app-particle-connection',

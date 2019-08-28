@@ -46,21 +46,32 @@
         color: theme(textColor) !important;   
       }
     }
-    
+
 .calendar-table{
       table-layout:fixed;
       
       td {
         @include themes() {
-            color: theme(textColor);  
+            color: theme(textColor);
+            border-color: lighten(theme(textColor), 50%);
         }
       }
     tbody td{
       height:140px;
       min-width:115px;
-      
-      &:not(.current){
-        color:#aaa;
+
+      &.current-day{
+        background: #5ec4ea !important;
+        font-weight: bold;
+      }
+
+      &:not(.selected-month) {
+        @include themes() {
+          color: rgba(theme(textColor), 0.4) !important;
+          background: rgba(theme(textColor), 0.1) !important;
+        }
+        /*background: rgba(242, 242, 242, 0.5);
+        background: rgba(255, 255, 255, 0.2);*/
       }
       
       span{

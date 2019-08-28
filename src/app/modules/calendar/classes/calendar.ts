@@ -2,29 +2,27 @@ import {CalendarEvent} from '../interfaces/calendar-event';
 import {Day} from '../interfaces/day';
 
 export class Calendar {
-
-
   constructor({date = new Date(), events = []} = {}) {
-      this.date = date;
-      this.weeks = [];
-      this.events = events;
+    this.date = date;
+    this.weeks = [];
+    this.events = events;
   }
-    public static daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    public static monthNames = ['January', 'February', 'March',
-      'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    public date: Date;
-    public month: string;
-    public year: number;
-    public weeks: any[];
-    public events: CalendarEvent[];
+  public static daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  public static monthNames = ['January', 'February', 'March',
+    'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  public date: Date;
+  public month: string;
+  public year: number;
+  public weeks: any[];
+  public events: CalendarEvent[];
 
   // Get First Day of Selected Month - Day of Week 0-6
-   static getFirstDayOfMonth(month, year): number {
+  static getFirstDayOfMonth(month, year): number {
     return new Date(year, month).getDay();
   }
 
   // Get Last Day of Selected Month - Day of Week 0-6
-   static getLastDayOfMonth(month, year): number {
+  static getLastDayOfMonth(month, year): number {
     return new Date(year, month + 1, 0).getDay();
   }
 
@@ -96,15 +94,18 @@ export class Calendar {
   }
 
   getDayEvents(day: number, month: number, year: number): Day {
-    const today = new Date(year, month, day);
-      const events: CalendarEvent[] = this.events.filter((event) => {
-        return event.startDate <= today && event.endDate >= today;
-      });
+    const today = new Date();
+    const searchDate = new Date(year, month, day);
+    const events: CalendarEvent[] = this.events.filter((event) => {
+      return event.startDate <= searchDate && event.endDate >= searchDate;
+    });
     return {
-        day: day,
-        currentMonth: this.date.getMonth() === month,
-        events: events
-      };
+      day: day,
+      selectedMonth: this.date.getMonth() === month,
+      currentMonth: today.getMonth() === month,
+      currentDay: today.getDate() === day,
+      events: events
+    };
   }
 
 
