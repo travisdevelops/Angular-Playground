@@ -15,13 +15,13 @@ export class Strand extends CanvasObject {
     this.position = new Vector({x: 0, y: 0});
     this.tails = [];
     this.tailMax = 15;
-    Strand.randomizeMovements(this);
+    this.randomizeMovements();
   }
 
   // Randomize Movements On A Random Interval That Continues To Change
-  static randomizeMovements(_self) {
-    _self.randomizeSpeed();
-    setTimeout(_self.randomizeMovements, Sketch.p5.random(200, 800), _self);
+  randomizeMovements() {
+    this.randomizeSpeed();
+    setTimeout(this.randomizeMovements, Sketch.p5.random(200, 800));
   }
 
   // Display Strand With Glow
@@ -62,7 +62,5 @@ export class Strand extends CanvasObject {
       y: this.position.y
     }));
   }
-
-
 }
 

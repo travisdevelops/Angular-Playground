@@ -99,11 +99,24 @@ export class Calendar {
     const events: CalendarEvent[] = this.events.filter((event) => {
       return event.startDate <= searchDate && event.endDate >= searchDate;
     });
+
+    // Sort Events By How Much Days They Span - Makes Longer Ranged Dates Stay On Top
+    events.sort((a: CalendarEvent, b: CalendarEvent) => {
+      const dateRangeA = Math.abs(a.startDate.getTime() - a.endDate.getTime());
+      const dateRangeB = Math.abs(b.startDate.getTime() - b.endDate.getTime());
+      if (dateRangeA > dateRangeB) { // A Date Range Is More Than B
+        return -1;
+      } else if (dateRangeA < dateRangeB) { // A Date Range Is More Than B
+        return 1;
+      } else { return 0; }
+    });
+
     return {
       day: day,
       selectedMonth: this.date.getMonth() === month,
-      currentMonth: today.getMonth() === month,
       currentDay: today.getDate() === day,
+      currentMonth: today.getMonth() === month,
+      currentYear: today.getFullYear() === year,
       events: events
     };
   }

@@ -5,8 +5,6 @@ import {Theme} from '@classes/theme';
 import {Sketch} from '@classes/sketch';
 import p5 from 'p5';
 
-let _self: ParticleConnectionComponent;
-
 @Component({
   selector: 'app-particle-connection',
   templateUrl: './particle-connection.component.html',
@@ -14,13 +12,12 @@ let _self: ParticleConnectionComponent;
 })
 export class ParticleConnectionComponent implements OnInit, OnDestroy {
   private particles: Particle[];
-  private totalParticles: number;
+  public particleCount: number;
   public particleConnectionLength: number;
 
   constructor() {
-    _self = this;
     this.particles = [];
-    this.totalParticles = 80;
+    this.particleCount = 200;
     this.particleConnectionLength = 100;
   }
 
@@ -34,23 +31,36 @@ export class ParticleConnectionComponent implements OnInit, OnDestroy {
 
   // Initialize P5 Sketch
   initP5Sketch(): void {
-    const sketch = function (p5sketch) {
+    const sketch = (p5sketch) => {
       Sketch.p5 = p5sketch;
       let canvas;
       let windowOffset;
 
       // Setup P5 js
-      p5sketch.setup = function () {
+      p5sketch.setup = () => {
         windowOffset = 100;
         canvas = p5sketch.createCanvas(p5sketch.windowWidth, p5sketch.windowHeight - windowOffset);
 
-        for (let i = 0; i < _self.totalParticles; i++) {
-          _self.particles.push(new Particle());
+        for (let i = 0; i < this.particleCount; i++) {
+          this.particles.push(new Particle());
         }
       };
 
       // Draw P5 js
-      p5sketch.draw = function () {
+      p5sketch.draw = () => {
+        // Adjust Count of Particles If Changed
+        if (this.particles.length !== this.particleCount) {
+          const oldParticles = [...this.particles];
+          this.particles = [];
+          for (let i = 0; i < this.particleCount; i++) {
+            if (oldParticles.length > i) {
+              this.particles.push(oldParticles[i]);
+            } else {
+              this.particles.push(new Particle());
+            }
+          }
+        }
+
         // Resize Canvas - Responsive
         if (canvas.width !== p5sketch.windowWidth || canvas.height !== p5sketch.windowHeight - windowOffset) {
           p5sketch.resizeCanvas(p5sketch.windowWidth, p5sketch.windowHeight - windowOffset);
@@ -59,26 +69,25 @@ export class ParticleConnectionComponent implements OnInit, OnDestroy {
         // Draw Background
         p5sketch.background(Theme.bgColor.x, Theme.bgColor.y, Theme.bgColor.z);
 
-        _self.particles.forEach((particle) => {
+        this.particles.forEach((particle) => {
           particle.move(); // Move Particle
           particle.display(); // Display Particle
 
           // Connect Particle To Other Particles
-          _self.particles.forEach((otherParticle) => {
+          this.particles.forEach((otherParticle) => {
             if (particle !== otherParticle) {
-              particle.connectToParticle(otherParticle.position, _self.particleConnectionLength);
+              particle.connectToParticle(otherParticle.position, this.particleConnectionLength);
             }
           });
           // Connect Particle To Mouse
           particle.connectToParticle(new Vector({
             x: p5sketch.mouseX,
             y: p5sketch.mouseY
-          }), _self.particleConnectionLength);
+          }), this.particleConnectionLength);
         });
       };
     };
 
     const p = new p5(sketch, 'canvas-container');
   }
-
 }
