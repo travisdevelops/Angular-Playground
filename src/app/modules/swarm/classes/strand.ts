@@ -36,7 +36,7 @@ export class Strand extends CanvasObject {
   }
 
   // Display Tails
-  displayTails() {
+  private displayTails() {
     Sketch.p5.noFill();
     for (let i = 0; i < this.tails.length - 1; i++) {
       const level = 3 - Math.floor(i / (this.tails.length / 3));
