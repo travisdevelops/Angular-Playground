@@ -4,7 +4,7 @@ import { Theme } from '@classes/theme';
 import { CanvasObject } from '@classes/canvas-object';
 import { Sketch } from '@classes/sketch';
 
-export class Emission extends CanvasObject {
+export class EmitterParticle extends CanvasObject {
     public objectOrigin: CanvasObject;
 
     constructor({position = new Vector()} = {}) {

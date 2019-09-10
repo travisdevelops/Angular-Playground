@@ -43,7 +43,7 @@ export class MazeComponent implements OnInit, OnDestroy {
         });
         player = new MazeStrand({
           size: new Vector({x: maze.cellSize / 2}),
-          speed: new Vector({x: 3, y: 3}),
+          speed: new Vector({x: 5, y: 5}),
           position: maze.startPos
         });
       };
@@ -56,20 +56,10 @@ export class MazeComponent implements OnInit, OnDestroy {
         }
         // Draw Background
         p5sketch.background(Theme.bgColor.x, Theme.bgColor.y, Theme.bgColor.z);
-        const newPlayerPosition = player.move();
-        if (maze.playerCanMove(newPlayerPosition)) {
-          player.position = newPlayerPosition;
-        }
+        player.moveInDirection();
         player.display();
-        maze.display();
-        showFPS();
-      };
-
-      const showFPS = () => {
-        const fps = Sketch.p5.frameRate();
-        Sketch.p5.fill(255);
-        Sketch.p5.stroke(0);
-        Sketch.p5.text('FPS: ' + fps.toFixed(2), 10, Sketch.p5.height - 10);
+        // maze.display();
+        Sketch.showFPS();
       };
     };
 

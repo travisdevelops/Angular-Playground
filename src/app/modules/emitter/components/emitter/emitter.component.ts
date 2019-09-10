@@ -44,13 +44,13 @@ export class EmitterComponent implements OnInit, OnDestroy {
 
           const mouseWheel = (event: WheelEvent) => {
             if (event.deltaY < 0) { // Wheel Scroll Up
-              if (this.emitter.emissionCount > 50) {
-                this.emitter.emissionCount -= 10;
+              if (this.emitter.maxParticles > 50) {
+                this.emitter.maxParticles -= 10;
               }
             }
             if (event.deltaY > 0) { // Wheel Scroll Down
-              if (this.emitter.emissionCount < 500) {
-                this.emitter.emissionCount += 10;
+              if (this.emitter.maxParticles < 700) {
+                this.emitter.maxParticles += 10;
               }
             }
           };

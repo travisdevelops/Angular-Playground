@@ -15,7 +15,6 @@ export class Strand extends CanvasObject {
     this.position = new Vector({x: 0, y: 0});
     this.tails = [];
     this.tailMax = 15;
-    this.randomizeMovements();
   }
 
   // Randomize Movements On A Random Interval That Continues To Change

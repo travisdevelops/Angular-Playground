@@ -1,6 +1,6 @@
 <div class="px-3 py-2">
-  <h5 class="mt-0 mb-3" *ngIf="!emitter.active">Try Clicking The Mouse!</h5>
-  <h5 class="mt-0 mb-3" *ngIf="emitter.active">Try Moving The Mouse!</h5>
-  <span>Max Emissions: {{emitter.emissionCount}}</span>
+  <p class="mt-0 mb-3" *ngIf="!emitter.active">Try Clicking The Mouse!</p>
+  <p class="mt-0 mb-3" *ngIf="emitter.active">Try Moving The Mouse! (Hint: Use The Mouse Wheel To Change The Particle Count)</p>
+  <span>Max Particles: {{emitter.maxParticles}}</span>
 </div>
 <div id="canvas-container"></div>

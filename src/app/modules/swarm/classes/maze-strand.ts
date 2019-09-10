@@ -11,6 +11,8 @@ export class MazeStrand extends Strand {
     this.position = position;
   }
 
+  // Implement Max Speed - Arrow Press Down Makes Speed Gradually Increase (Prevents Sharps Turns)
+  // Light Up Area Size Proportionate to Speed
   moveInDirection() {
     const newPosition = new Vector(this.position);
 

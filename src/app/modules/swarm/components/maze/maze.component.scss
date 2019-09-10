@@ -1,0 +1,8 @@
+@import '../../../../../../src/styles';
+
+:host{
+  display: block;
+  @include themesHost() {
+    color: theme(textColor);
+  }
+}

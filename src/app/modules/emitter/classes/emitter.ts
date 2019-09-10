@@ -1,31 +1,31 @@
 import {Vector} from '@classes/vector';
 import {Helper} from '@classes/helper';
 import {CanvasObject} from '@classes/canvas-object';
-import {Emission} from './emission';
+import {EmitterParticle} from './emitter-particle';
 
 export class Emitter extends CanvasObject {
-  public emissions: Emission[];
-  public emissionCount = 300;
+  public particles: EmitterParticle[];
+  public maxParticles = 400;
   public active: boolean;
 
-  constructor({position = new Vector(), emissionCount = 300} = {}) {
+  constructor({position = new Vector(), maxParticles = 300} = {}) {
     super({position: position});
-    this.emissions = [];
-    this.emissionCount = emissionCount;
+    this.particles = [];
+    this.maxParticles = maxParticles;
     this.active = false;
   }
 
-  // Add Emissions
+  // Emit EmitterParticles
   emit(): void {
     if (this.active) {
-      if (this.emissions.length > this.emissionCount) {// Remove A Single Emission (Immediately)
-        this.emissions.pop();
+      if (this.particles.length > this.maxParticles) {// Remove A Single Emission (Immediately)
+        this.particles.pop();
         this.emit();
       } else {
         setTimeout(() => {
           if (this.active) {
-            if (this.emissions.length < this.emissionCount) {// Add A Single Emission (After Delay)
-              this.emissions.push(new Emission({position: new Vector(this.position)}));
+            if (this.particles.length < this.maxParticles) {// Add A Single Emission (After Delay)
+              this.particles.push(new EmitterParticle({position: new Vector(this.position)}));
             }
             this.emit();
           }
@@ -36,22 +36,22 @@ export class Emitter extends CanvasObject {
 
   // Display All Emissions
   display(): void {
-    const activeEmissions: Emission[] = [];
-    this.emissions.forEach((emission) => {
-      emission.move();
-      emission.display();
-      const canRespawn: boolean = emission.opacity <= 0 || emission.isOutsideCanvas(emission.position);
+    const tempParticles: EmitterParticle[] = [];
+    this.particles.forEach((particle: EmitterParticle) => {
+      particle.move();
+      particle.display();
+      const canRespawn: boolean = particle.opacity <= 0 || particle.isOutsideCanvas(particle.position);
 
       if (this.active && canRespawn) {// If Emitter Active & Can Respawn
-        emission.respawn(this.position);
+        particle.respawn(this.position);
       }
 
       // If Emitter Active & Can Respawn Then Add To Active Emissions
       // If Not Respawned Then Add To Active Emissions
       if ((this.active && canRespawn) || !canRespawn) {
-        activeEmissions.push(emission);
+        tempParticles.push(particle);
       }
     });
-    this.emissions = activeEmissions;
+    this.particles = tempParticles;
   }
 }

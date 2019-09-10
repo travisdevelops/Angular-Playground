@@ -36,6 +36,7 @@ export class Core extends CanvasObject {
   addStrands(count) {
     for (let i = 0; i < count; i++) {
       const strand = new Strand();
+      strand.randomizeMovements();
       strand.position = this.getPositionInsideCore();
       this.strands.push(strand);
     }

@@ -63,7 +63,7 @@ export class SwarmComponent implements OnInit, OnDestroy {
         if (mouseDown && Sketch.p5.mouseIsPressed) {
           this.coreManager.moveCoreByMousePosition(mouseOrigin, new Vector({x: Sketch.p5.mouseX, y: Sketch.p5.mouseY}));
         }
-        showFPS();
+        Sketch.showFPS();
       };
 
       const canvasMousePressed = () => {
@@ -80,13 +80,6 @@ export class SwarmComponent implements OnInit, OnDestroy {
       const canvasMouseWheel = (event) => {
         const scrollSize = event.deltaY < 0 ? -10 : 10; // Move In Increments of 10
         this.coreManager.resizeCores(scrollSize);
-      };
-
-      const showFPS = () => {
-        const fps = Sketch.p5.frameRate();
-        Sketch.p5.fill(255);
-        Sketch.p5.stroke(0);
-        Sketch.p5.text('FPS: ' + fps.toFixed(2), 10, Sketch.p5.height - 10);
       };
 
     };
