@@ -4,24 +4,24 @@ import {Strand} from './strand';
 import {Sketch} from '@classes/sketch';
 import {Theme} from '@classes/theme';
 
-export class Core extends CanvasObject {
+export class StrandContainer extends CanvasObject {
   public strands: Strand[];
   public origin: Vector;
   public square: boolean;
   public movable: boolean;
 
 
-  constructor({strandCount = 0, size = new Vector(), position = new Vector(), square = true} = {}) {
+  constructor({strandCount = 0, size = new Vector(), position = new Vector(), color = new Vector(), square = true} = {}) {
     super({position: position, size: size});
     this.strands = [];
     this.origin = new Vector(this.position);
     this.square = square;
     this.movable = false;
     this.opacity = 20;
-    this.addStrands(strandCount);
+    this.createStrands(strandCount, color);
   }
 
-  // Display Core
+  // Display Strand Container
   display() {
     this.color = new Vector({x: Theme.textColor.x, y: Theme.textColor.y, z: Theme.textColor.z});
     Sketch.p5.noStroke();
@@ -32,37 +32,37 @@ export class Core extends CanvasObject {
     } else { Sketch.p5.rect(this.position.x - this.size.x, this.position.y - this.size.y, this.size.x * 2, this.size.y * 2); }
   }
 
-  // Add Strands To Core
-  addStrands(count) {
+  // Create Strands And Add To Strand Container
+  createStrands(count: number, color: Vector) {
     for (let i = 0; i < count; i++) {
-      const strand = new Strand();
+      const strand = new Strand({color: color});
       strand.randomizeMovements();
-      strand.position = this.getPositionInsideCore();
+      strand.position = this.getPositionInsideStrandContainer();
       this.strands.push(strand);
     }
   }
 
-  // Get Position That Is Inside Core Width/Radius
-  getPositionInsideCore() {
+  // Get Position That Is Inside Strand Container Width/Radius
+  getPositionInsideStrandContainer() {
     const xRangeL = this.size.x - Sketch.p5.abs(this.position.x);
     const xRangeR = this.size.x + Sketch.p5.abs(this.position.x);
     const yRangeT = this.size.y - Sketch.p5.abs(this.position.y);
     const yRangeB = this.size.y + Sketch.p5.abs(this.position.y);
     const position = new Vector({x: Sketch.p5.random(-xRangeL, xRangeR), y: Sketch.p5.random(-yRangeT, yRangeB)});
-    if (this.isPositionOutsideOfCore(position)) {
-      return this.getPositionInsideCore();
+    if (this.isPositionOutsideOfStrandContainer(position)) {
+      return this.getPositionInsideStrandContainer();
     }
     return position;
   }
 
-  // Check If Strand Position is Outside of The Width/Radius of A Single Core
-  isPositionOutsideOfCore(position) {
+  // Check If Strand Position is Outside of The Width/Radius of A Single Strand Container
+  isPositionOutsideOfStrandContainer(position) {
     if (this.square) {// Rect
-      const topOfCore = position.y < this.position.y - this.size.y;
-      const rightOfCore = position.x > this.position.x + this.size.x;
-      const bottomOfCore = position.y > this.position.y + this.size.y;
-      const leftOfCore = position.x < this.position.x - this.size.x;
-      return topOfCore || rightOfCore || bottomOfCore || leftOfCore;
+      const topOfStrandContainer = position.y < this.position.y - this.size.y;
+      const rightOfStrandContainer = position.x > this.position.x + this.size.x;
+      const bottomOfStrandContainer = position.y > this.position.y + this.size.y;
+      const leftOfStrandContainer = position.x < this.position.x - this.size.x;
+      return topOfStrandContainer || rightOfStrandContainer || bottomOfStrandContainer || leftOfStrandContainer;
     } else {// Ellipse
       const d = Sketch.p5.dist(position.x, position.y, this.position.x, this.position.y);
       return d > this.size.x;

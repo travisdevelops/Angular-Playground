@@ -2,7 +2,7 @@ import {Vector} from '@classes/vector';
 import {Strand} from '@app/modules/swarm/classes/strand';
 import {Sketch} from '@classes/sketch';
 
-export class MazeStrand extends Strand {
+export class MazePlayer extends Strand {
 
   constructor({ position = new Vector(), size = new Vector(), speed = new Vector() } = {}) {
     super();

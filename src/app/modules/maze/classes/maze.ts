@@ -1,6 +1,6 @@
-import {MazeCell} from '@app/modules/swarm/classes/maze-cell';
 import {Vector} from '@classes/vector';
 import {Sketch} from '@classes/sketch';
+import {MazeCell} from '@app/modules/maze/classes/maze-cell';
 
 export class Maze {
   cells: MazeCell[][] = [];

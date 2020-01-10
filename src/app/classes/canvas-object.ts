@@ -36,7 +36,7 @@ export class CanvasObject {
 
   // Check If Speed Is Below A Threshold on X & Y
   isSpeedTooSlow(): boolean {
-    return Sketch.p5.abs(this.speed.x) < this.minSpeed && Sketch.p5.abs(this.speed.y) < this.minSpeed;
+    return Sketch.p5.abs(this.speed.x) < this.minSpeed.x && Sketch.p5.abs(this.speed.y) < this.minSpeed.y;
   }
 
   // Set A New Random Speed
@@ -44,14 +44,6 @@ export class CanvasObject {
     this.speed = new Vector({x: Sketch.p5.random(-this.maxSpeed.x, this.maxSpeed.x), y: Sketch.p5.random(-this.maxSpeed.y, this.maxSpeed.y)});
     if (this.isSpeedTooSlow()) {
       this.randomizeSpeed();
-    }
-  }
-
-  // Get Position That Is Inside Core Width/Radius
-  randomizePosition(): void {
-    this.position = new Vector({x: Sketch.p5.random(0, Sketch.p5.width), y: Sketch.p5.random(0, Sketch.p5.height)});
-    if (this.isOutsideCanvas(this.position)) {
-      this.randomizePosition();
     }
   }
 

@@ -2,9 +2,9 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Sketch} from '@classes/sketch';
 import {Theme} from '@classes/theme';
 import {Vector} from '@classes/vector';
-import {MazeStrand} from '@app/modules/swarm/classes/maze-strand';
-import {Maze} from '@app/modules/swarm/classes/maze';
 import p5 from 'p5';
+import {MazePlayer} from '@app/modules/maze/classes/maze-player';
+import {Maze} from '@app/modules/maze/classes/maze';
 
 @Component({
   selector: 'app-maze',
@@ -41,7 +41,7 @@ export class MazeComponent implements OnInit, OnDestroy {
           height: p5sketch.windowHeight - windowOffset,
           cellSize: 25
         });
-        player = new MazeStrand({
+        player = new MazePlayer({
           size: new Vector({x: maze.cellSize / 2}),
           speed: new Vector({x: 5, y: 5}),
           position: maze.startPos

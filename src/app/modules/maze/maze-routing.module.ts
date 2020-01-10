@@ -1,11 +1,11 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { SwarmComponent } from './components/swarm/swarm.component';
+import {MazeComponent} from './components/maze/maze.component';
 
-const routes: Routes = [{ path: '', component: SwarmComponent }];
+const routes: Routes = [{ path: '', component: MazeComponent }];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class SwarmRoutingModule { }
+export class MazeRoutingModule { }

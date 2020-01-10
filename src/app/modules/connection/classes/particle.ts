@@ -34,6 +34,14 @@ export class Particle extends CanvasObject {
     this.randomizePosition();
   }
 
+  // Get Position That Is Inside Core Width/Radius
+  randomizePosition(): void {
+    this.position = new Vector({x: Sketch.p5.random(0, Sketch.p5.width), y: Sketch.p5.random(0, Sketch.p5.height)});
+    if (this.isOutsideCanvas(this.position)) {
+      this.randomizePosition();
+    }
+  }
+
   // Connect To Another Particle if Distance Is Within Connection Length
   // Doesnt Include Size of Shape
   connectToParticle(particlePosition: Vector, connectionLength: number): void {
