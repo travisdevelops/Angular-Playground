@@ -8,7 +8,6 @@ export class StrandContainer extends CanvasObject {
   public strands: Strand[];
   public origin: Vector;
   public square: boolean;
-  public movable: boolean;
 
 
   constructor({strandCount = 0, size = new Vector(), position = new Vector(), color = new Vector(), square = true} = {}) {
@@ -16,28 +15,43 @@ export class StrandContainer extends CanvasObject {
     this.strands = [];
     this.origin = new Vector(this.position);
     this.square = square;
-    this.movable = false;
+    if (!this.square) {
+      this.size.y = this.size.x;
+    }
     this.opacity = 20;
     this.createStrands(strandCount, color);
   }
 
   // Display Strand Container
   display() {
+    this.displayContainer();
+    this.displayStrands();
+  }
+
+  displayContainer() {
     this.color = new Vector({x: Theme.textColor.x, y: Theme.textColor.y, z: Theme.textColor.z});
     Sketch.p5.noStroke();
     Sketch.p5.fill(this.color.x, this.color.y, this.color.z, this.opacity);
     if (!this.square) {
       const size = this.size.x < this.size.y ? this.size.x : this.size.y;
       Sketch.p5.ellipse(this.position.x, this.position.y, size * 2);
-    } else { Sketch.p5.rect(this.position.x - this.size.x, this.position.y - this.size.y, this.size.x * 2, this.size.y * 2); }
+    } else {
+      Sketch.p5.rect(this.position.x - this.size.x, this.position.y - this.size.y, this.size.x * 2, this.size.y * 2);
+    }
+  }
+
+  displayStrands() {
+    this.strands.forEach((strand) => {
+      strand.display();
+    });
   }
 
   // Create Strands And Add To Strand Container
   createStrands(count: number, color: Vector) {
     for (let i = 0; i < count; i++) {
       const strand = new Strand({color: color});
-      strand.randomizeMovements();
       strand.position = this.getPositionInsideStrandContainer();
+      strand.randomizeMovements();
       this.strands.push(strand);
     }
   }
@@ -68,7 +82,6 @@ export class StrandContainer extends CanvasObject {
       return d > this.size.x;
     }
   }
-
 
 }
 

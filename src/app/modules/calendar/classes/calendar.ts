@@ -100,15 +100,22 @@ export class Calendar {
       return event.startDate <= searchDate && event.endDate >= searchDate;
     });
 
-    // Sort Events By How Much Days They Span - Makes Longer Ranged Dates Stay On Top
+    // Sort Events By Start Date
+    // If Same Start Date Sort Events By How Much Days They Span - Makes Longer Ranged Dates Stay On Top
     events.sort((a: CalendarEvent, b: CalendarEvent) => {
-      const dateRangeA = Math.abs(a.startDate.getTime() - a.endDate.getTime());
-      const dateRangeB = Math.abs(b.startDate.getTime() - b.endDate.getTime());
-      if (dateRangeA > dateRangeB) { // A Date Range Is More Than B
+      if (a.startDate.getTime() < b.startDate.getTime()) { // A Occurs Before B
         return -1;
-      } else if (dateRangeA < dateRangeB) { // A Date Range Is More Than B
+      } else if (a.startDate.getTime() > b.startDate.getTime()) { // A Occurs After B
         return 1;
-      } else { return 0; }
+      } else {
+        const dateRangeA = Math.abs(a.startDate.getTime() - a.endDate.getTime());
+        const dateRangeB = Math.abs(b.startDate.getTime() - b.endDate.getTime());
+        if (dateRangeA > dateRangeB) { // A Date Range Is More Than B
+          return -1;
+        } else if (dateRangeA < dateRangeB) { // A Date Range Is More Than B
+          return 1;
+        } else { return 0; }
+      }
     });
 
     return {

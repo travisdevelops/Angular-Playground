@@ -1,17 +1,17 @@
-import {CanvasObject} from '@classes/canvas-object';
-import {Vector} from '@classes/vector';
-import {Sketch} from '@classes/sketch';
+export class Wall {
+  public col: number;
+  public row: number;
+  public top: boolean;
+  public bottom: boolean;
+  public left: boolean;
+  public right: boolean;
 
-export class Wall extends CanvasObject {
-
-  constructor({size = new Vector(), position = new Vector(), color = new Vector()} = {}) {
-    super({position: position, size: size});
-    this.color = color;
-    this.size = size;
-    this.position = position;
-  }
-
-  // Display Strand With Glow
-  display() {
+  constructor({col = 0, row = 0, top = false, bottom = false, left = false, right = false} = {}) {
+    this.col = col;
+    this.row = row;
+    this.top = top;
+    this.bottom = bottom;
+    this.left = left;
+    this.right = right;
   }
 }

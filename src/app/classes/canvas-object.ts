@@ -31,7 +31,7 @@ export class CanvasObject {
 
   // Move Canvas Object
   move() {
-    this.position = this.getPotentialPosition();
+    this.position = this.getPositionUsingSpeed();
   }
 
   // Check If Speed Is Below A Threshold on X & Y
@@ -47,8 +47,8 @@ export class CanvasObject {
     }
   }
 
-  // Get Potential Position Based on Current Speed
-  getPotentialPosition() {
+  // Get Position Based on Current Speed
+  getPositionUsingSpeed() {
     return new Vector({
       x: this.position.x + this.speed.x,
       y: this.position.y + this.speed.y

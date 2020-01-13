@@ -23,7 +23,7 @@ export class Particle extends CanvasObject {
 
   // Override Move
   move(): void {
-    if (this.isOutsideCanvas(this.getPotentialPosition())) {
+    if (this.isOutsideCanvas(this.getPositionUsingSpeed())) {
       this.randomizeSpeed();
     } else { super.move(); }
   }

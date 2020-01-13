@@ -25,7 +25,7 @@ export class CalendarComponent implements OnInit {
     this.calendar.events.push({
       title: 'Sample Event Number 1',
       color: new Vector({y: 191, z: 255}),
-      startDate: new Date(today.getFullYear(), today.getMonth(), 21),
+      startDate: new Date(today.getFullYear(), today.getMonth(), 20),
       endDate: new Date(today.getFullYear(), today.getMonth(), 21),
       createdBy: 'Travis Simon'
     });
@@ -47,7 +47,7 @@ export class CalendarComponent implements OnInit {
       title: 'Sample Event Number 4',
       color: new Vector({y: 165, z: 211}),
       startDate: new Date(today.getFullYear(), today.getMonth(), 21),
-      endDate: new Date(today.getFullYear(), today.getMonth(), 21),
+      endDate: new Date(today.getFullYear(), today.getMonth(), 23),
       createdBy: 'Test User'
     });
     this.calendar.events.push({
@@ -62,6 +62,13 @@ export class CalendarComponent implements OnInit {
       color: new Vector({y: 126, z: 220}),
       startDate: new Date(today.getFullYear(), today.getMonth(), 21),
       endDate: new Date(today.getFullYear(), today.getMonth(), 21),
+      createdBy: 'Test User'
+    });
+    this.calendar.events.push({
+      title: 'Sample Event Number 7',
+      color: new Vector({y: 126, z: 220}),
+      startDate: new Date(today.getFullYear(), today.getMonth(), 23),
+      endDate: new Date(today.getFullYear(), today.getMonth(), 27),
       createdBy: 'Test User'
     });
 

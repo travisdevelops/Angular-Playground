@@ -43,8 +43,8 @@ export class MazeComponent implements OnInit, OnDestroy {
         });
         player = new MazePlayer({
           size: new Vector({x: maze.cellSize / 2}),
-          speed: new Vector({x: 5, y: 5}),
-          position: maze.startPos
+          maxSpeed: new Vector({x: 10, y: 10}),
+          position: new Vector({x: maze.width / 2, y: maze.height / 2})
         });
       };
 
@@ -56,7 +56,7 @@ export class MazeComponent implements OnInit, OnDestroy {
         }
         // Draw Background
         p5sketch.background(Theme.bgColor.x, Theme.bgColor.y, Theme.bgColor.z);
-        player.moveInDirection();
+        player.move();
         player.display();
         // maze.display();
         Sketch.showFPS();
