@@ -48,11 +48,7 @@ export class StrandContainerManager {
       } else { outsideStrandContainerCount++; }
     }
     if (outsideStrandContainerCount === this.strandContainers.length) {// Outside All Strand Containers
-      if (strandContainer.movable) {// Strand Container Was Moving Which Is Why Its Outside So Return To Home Strand Container
-        strand.tails = [];
-        // strand.position = strandContainer.getPositionInsideStrandContainer();
-        // TODO: Translate Positions With Container
-      } else { strand.randomizeMovements(); }
+      strand.randomizeMovements();
     }
   }
 

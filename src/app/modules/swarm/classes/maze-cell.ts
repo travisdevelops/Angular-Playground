@@ -1,4 +1,4 @@
-export class Wall {
+export class MazeCell {
   public col: number;
   public row: number;
   public top: boolean;

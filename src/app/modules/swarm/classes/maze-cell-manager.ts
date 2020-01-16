@@ -1,16 +1,16 @@
 import {Vector} from '@classes/vector';
 import {Sketch} from '@classes/sketch';
-import {Wall} from '@app/modules/swarm/classes/wall';
+import {MazeCell} from '@app/modules/swarm/classes/maze-cell';
 import {Strand} from '@app/modules/swarm/classes/strand';
 
-export class WallManager {
-  private walls: Wall[] = [];
+export class MazeCellManager {
+  private mazeCells: MazeCell[] = [];
   private gridSpacing: number;
   private color: Vector;
   private position: Vector;
   private debug: boolean;
   private strands: Strand[] = [];
-  private strandEntrances: Wall[] = [];
+  private strandEntrances: MazeCell[] = [];
 
   constructor({gridSpacing = 120, color = new Vector(), position = new Vector(), debug = false} = {}) {
     this.gridSpacing = gridSpacing;
@@ -20,7 +20,7 @@ export class WallManager {
   }
 
   display() {
-    this.walls.forEach((wall) => {
+    this.mazeCells.forEach((wall) => {
       Sketch.p5.noFill();
       Sketch.p5.strokeWeight(5);
       Sketch.p5.stroke(this.color.x, this.color.y, this.color.z);
@@ -49,7 +49,7 @@ export class WallManager {
     });
 
     this.strands.forEach((strand) => {
-      if (!this.positionIsOutsideWallCell(strand.position, strand.getPositionUsingSpeed())) {
+      if (!this.positionIsOutsideCell(strand.position, strand.getPositionUsingSpeed())) {
         strand.move();
       } else {
         strand.randomizeMovements();
@@ -90,12 +90,12 @@ export class WallManager {
     Sketch.p5.text('(' + wall.col + ',' + wall.row + ')', wallPosition.x + (this.gridSpacing / 2), wallPosition.y + (this.gridSpacing / 2));
   }
 
-  addWall(wallParams) {
-    this.walls.push(new Wall(wallParams));
+  addCell(wallParams) {
+    this.mazeCells.push(new MazeCell(wallParams));
   }
 
   addStrandEntrance(wallParams) {
-    this.strandEntrances.push(new Wall(wallParams));
+    this.strandEntrances.push(new MazeCell(wallParams));
   }
 
   // Create Strands
@@ -121,36 +121,43 @@ export class WallManager {
   }
 
   // Check If Strand Position is Outside
-  positionIsOutsideWallCell(currentPosition, potentialPosition) {
-    const nearestCellFromPosition = this.convertPositionToColRow(currentPosition);
-    const currentCellPosition = this.convertColRowToPosition(nearestCellFromPosition.x, nearestCellFromPosition.y);
-    const actualCurrentCell = this.walls.find((wall) => {
-      return wall.col === nearestCellFromPosition.x && wall.row === nearestCellFromPosition.y;
+  positionIsOutsideCell(currentPosition, potentialPosition) {
+    const currentCellColAndRow = this.convertPositionToColRow(currentPosition);
+    const currentCellPosition = this.convertColRowToPosition(currentCellColAndRow.x, currentCellColAndRow.y);
+
+    // Get Current Direction
+    const headingTowardsTopOfCell = potentialPosition.y < currentCellPosition.y;
+    const headingTowardsBottomOfCell = potentialPosition.y > currentCellPosition.y + this.gridSpacing;
+    const headingTowardsLeftOfCell = potentialPosition.x < currentCellPosition.x;
+    const headingTowardsRightOfCell = potentialPosition.x > currentCellPosition.x + this.gridSpacing;
+
+    // Get Current Cell Borders
+    const currentCell = this.mazeCells.find((wall) => {
+      return wall.col === currentCellColAndRow.x && wall.row === currentCellColAndRow.y;
     });
-    if (actualCurrentCell == null) {
-      return false;
-    }
-    const topOfCurrentCell = actualCurrentCell.top && potentialPosition.y < currentCellPosition.y;
-    const bottomOfCurrentCell = actualCurrentCell.bottom && potentialPosition.y > currentCellPosition.y + this.gridSpacing;
-    const leftOfCurrentCell = actualCurrentCell.left && potentialPosition.x < currentCellPosition.x;
-    const rightOfCurrentCell = actualCurrentCell.right && potentialPosition.x > currentCellPosition.x + this.gridSpacing;
-    const outsideOfCellBorders = topOfCurrentCell || rightOfCurrentCell || bottomOfCurrentCell || leftOfCurrentCell;
-    if (outsideOfCellBorders) {
-      return true;
+    if (currentCell != null) {
+      const outsideTopOfCurrentCell = currentCell.top && headingTowardsTopOfCell;
+      const bottomOfCurrentCell = currentCell.bottom && headingTowardsBottomOfCell;
+      const leftOfCurrentCell = currentCell.left && headingTowardsLeftOfCell;
+      const rightOfCurrentCell = currentCell.right && headingTowardsRightOfCell;
+      const outsideOfCellBorders = outsideTopOfCurrentCell || rightOfCurrentCell || bottomOfCurrentCell || leftOfCurrentCell;
+      if (outsideOfCellBorders) {
+        return true;
+      }
     }
     // Check Neighbors Borders
-    const nearestCellFromPotentialPosition = this.convertPositionToColRow(potentialPosition);
-    const actualNeighborCell = this.walls.find((wall) => {
-      return wall.col === nearestCellFromPotentialPosition.x && wall.row === nearestCellFromPotentialPosition.y;
+    const neighborCellColAndRow = this.convertPositionToColRow(potentialPosition);
+    const neighborCell = this.mazeCells.find((mazeCell) => {
+      return mazeCell.col === neighborCellColAndRow.x && mazeCell.row === neighborCellColAndRow.y;
     });
-    if (actualNeighborCell == null) {
-      return false;
+    if (neighborCell != null) {
+      const outsideTopOfNeighborCell = headingTowardsBottomOfCell && neighborCell.top;
+      const outsideBottomOfNeighborCell = headingTowardsTopOfCell && neighborCell.bottom;
+      const outsideLeftOfNeighborCell = headingTowardsRightOfCell && neighborCell.left;
+      const outsideRightOfNeighborCell = headingTowardsLeftOfCell && neighborCell.right;
+      return outsideTopOfNeighborCell || outsideBottomOfNeighborCell || outsideLeftOfNeighborCell || outsideRightOfNeighborCell;
     }
-    const topOfNeighborCell = bottomOfCurrentCell && actualNeighborCell.top;
-    const bottomOfNeighborCell = topOfCurrentCell && actualNeighborCell.bottom;
-    const leftOfNeighborCell = rightOfCurrentCell && actualNeighborCell.left;
-    const rightOfNeighborCell = leftOfCurrentCell && actualNeighborCell.right;
-    return topOfNeighborCell || rightOfNeighborCell || bottomOfNeighborCell || leftOfNeighborCell;
+    return false;
   }
 
 }

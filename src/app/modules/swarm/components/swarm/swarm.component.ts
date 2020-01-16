@@ -4,7 +4,7 @@ import { Theme } from '@classes/theme';
 import { Sketch } from '@classes/sketch';
 import p5 from 'p5';
 import {StrandContainerManager} from '@app/modules/swarm/classes/strand-container-manager';
-import {WallManager} from '@app/modules/swarm/classes/wall-manager';
+import {MazeCellManager} from '@app/modules/swarm/classes/maze-cell-manager';
 
 @Component({
   selector: 'app-swarm',
@@ -13,7 +13,7 @@ import {WallManager} from '@app/modules/swarm/classes/wall-manager';
 })
 export class SwarmComponent implements OnInit, OnDestroy {
   private strandContainerManager: StrandContainerManager;
-  private wallManager: WallManager;
+  private mazeCellManager: MazeCellManager;
 
   constructor() {}
 
@@ -22,21 +22,19 @@ export class SwarmComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    Sketch.p5.remove();
+    Sketch.reset();
   }
 
   // Initialize P5 Sketch
   initP5Sketch(): void {
     const sketch = (p5sketch) => {
       Sketch.p5 = p5sketch;
-      let canvas;
-      let windowOffset;
 
       // Setup P5 js
       p5sketch.setup = () => {
-        windowOffset = 100;
-        canvas = p5sketch.createCanvas(p5sketch.windowWidth, p5sketch.windowHeight - windowOffset);
-
+        Sketch.windowOffset = 100;
+        Sketch.canvas = p5sketch.createCanvas(0, 0);
+      console.log('test');
         // Strand Containers
         this.strandContainerManager = new StrandContainerManager();
         this.strandContainerManager.addStrandContainer({ size: new Vector({x: 150, y: 30}),
@@ -48,55 +46,46 @@ export class SwarmComponent implements OnInit, OnDestroy {
         this.strandContainerManager.addStrandContainer({ size: new Vector({x: 60 }),
           position: new Vector({x: 500, y: 100}), strandCount: 10, color: new Vector({x: 159, y: 32, z: 66}), square: false });
 
-        // Wall Manager
-        this.wallManager = new WallManager({position: new Vector({x: 600, y: 0}), color: new Vector({x: 159, y: 32, z: 66}),
+        // Maze Cell Manager
+        this.mazeCellManager = new MazeCellManager({position: new Vector({x: 600, y: 0}), color: new Vector({x: 159, y: 32, z: 66}),
           debug: true });
-        this.wallManager.addWall({col: 0, row: 0, right: true, bottom: true});
-        this.wallManager.addWall({col: 0, row: 1, top: true, bottom: true, left: true });
-        this.wallManager.addWall({col: 0, row: 2, top: true, right: true});
-        this.wallManager.addWall({col: 1, row: 0, top: true});
-        this.wallManager.addWall({col: 1, row: 3, left: true, right: true});
-        this.wallManager.addWall({col: 1, row: 3, left: true, right: true});
-        this.wallManager.addWall({col: 1, row: 4, left: true, bottom: true});
-        this.wallManager.addWall({col: 2, row: 0, top: true});
-        this.wallManager.addWall({col: 2, row: 1, left: true, right: true});
-        this.wallManager.addWall({col: 2, row: 2, left: true, right: true});
-        this.wallManager.addWall({col: 2, row: 4, bottom: true, top: true});
-        this.wallManager.addWall({col: 3, row: 0, left: true, right: true});
-        this.wallManager.addWall({col: 3, row: 2, bottom: true, right: true});
-        this.wallManager.addWall({col: 3, row: 4, top: true, bottom: true});
-        this.wallManager.addWall({col: 4, row: 0, top: true});
-        this.wallManager.addWall({col: 4, row: 1, left: true, right: true});
-        this.wallManager.addWall({col: 4, row: 3, bottom: true, right: true});
-        this.wallManager.addWall({col: 4, row: 4, bottom: true});
-        this.wallManager.addWall({col: 5, row: 0, top: true});
-        this.wallManager.addWall({col: 5, row: 2, left: true, right: true});
-        this.wallManager.addWall({col: 5, row: 4, bottom: true, right: true});
-        this.wallManager.addWall({col: 6, row: 0, left: true});
-        this.wallManager.addWall({col: 6, row: 1, left: true});
-        this.wallManager.addWall({col: 6, row: 3, bottom: true, top: true, right: true});
+        this.mazeCellManager.addCell({col: 0, row: 0, right: true, bottom: true});
+        this.mazeCellManager.addCell({col: 0, row: 1, top: true, bottom: true, left: true });
+        this.mazeCellManager.addCell({col: 0, row: 2, top: true, right: true});
+        this.mazeCellManager.addCell({col: 1, row: 0, top: true});
+        this.mazeCellManager.addCell({col: 1, row: 3, left: true, right: true});
+        this.mazeCellManager.addCell({col: 1, row: 3, left: true, right: true});
+        this.mazeCellManager.addCell({col: 1, row: 4, left: true, bottom: true});
+        this.mazeCellManager.addCell({col: 2, row: 0, top: true});
+        this.mazeCellManager.addCell({col: 2, row: 1, left: true, right: true});
+        this.mazeCellManager.addCell({col: 2, row: 2, left: true, right: true});
+        this.mazeCellManager.addCell({col: 2, row: 4, bottom: true, top: true});
+        this.mazeCellManager.addCell({col: 3, row: 0, left: true, right: true});
+        this.mazeCellManager.addCell({col: 3, row: 2, bottom: true, right: true});
+        this.mazeCellManager.addCell({col: 3, row: 4, top: true, bottom: true});
+        this.mazeCellManager.addCell({col: 4, row: 0, top: true});
+        this.mazeCellManager.addCell({col: 4, row: 1, left: true, right: true});
+        this.mazeCellManager.addCell({col: 4, row: 3, bottom: true, right: true});
+        this.mazeCellManager.addCell({col: 4, row: 4, bottom: true});
+        this.mazeCellManager.addCell({col: 5, row: 0, top: true});
+        this.mazeCellManager.addCell({col: 5, row: 2, left: true, right: true});
+        this.mazeCellManager.addCell({col: 5, row: 4, bottom: true, right: true});
+        this.mazeCellManager.addCell({col: 6, row: 0, left: true});
+        this.mazeCellManager.addCell({col: 6, row: 1, left: true});
+        this.mazeCellManager.addCell({col: 6, row: 3, bottom: true, top: true, right: true});
 
         // Strand Entrances
-        this.wallManager.addStrandEntrance({col: 0, row: 1, left: true});
+        this.mazeCellManager.addStrandEntrance({col: 0, row: 1, left: true});
 
-        this.wallManager.createStrands(20, new Vector({x: 188, y: 254, z: 0}));
+        this.mazeCellManager.createStrands(1, new Vector({x: 188, y: 254, z: 0}));
       };
 
       // Draw P5 js
       p5sketch.draw = () => {
-        // Resize Canvas - Responsive
-        if (canvas.width !== p5sketch.windowWidth || canvas.height !== p5sketch.windowHeight - windowOffset) {
-          p5sketch.resizeCanvas(p5sketch.windowWidth, p5sketch.windowHeight - windowOffset);
-        }
-
-        // Draw Background
-        p5sketch.background(Theme.bgColor.x, Theme.bgColor.y, Theme.bgColor.z);
-
+        Sketch.draw();
         this.strandContainerManager.display();
-        this.wallManager.display();
-        Sketch.showFPS();
+        this.mazeCellManager.display();
       };
-
     };
 
     const p = new p5(sketch, 'canvas-container');
