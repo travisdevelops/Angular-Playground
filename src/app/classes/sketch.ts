@@ -9,6 +9,7 @@ export class Sketch {
       const fps = Sketch.p5.frameRate();
       Sketch.p5.fill(0);
       Sketch.p5.noStroke();
+      Sketch.p5.textAlign(Sketch.p5.LEFT);
       Sketch.p5.text('FPS: ' + fps.toFixed(2), 10, Sketch.p5.height - 20);
     }
 
@@ -22,8 +23,8 @@ export class Sketch {
     public static draw() {
       if (Sketch.p5 != null && Sketch.canvas != null) {
         Sketch.resize();
-        Sketch.showFPS();
         Sketch.p5.background(Theme.bgColor.x, Theme.bgColor.y, Theme.bgColor.z);
+        Sketch.showFPS();
       }
     }
 

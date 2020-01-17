@@ -4,7 +4,6 @@ import {Theme} from '@classes/theme';
 import {Vector} from '@classes/vector';
 import p5 from 'p5';
 import {MazePlayer} from '@app/modules/maze/classes/maze-player';
-import {Maze} from '@app/modules/maze/classes/maze';
 
 @Component({
   selector: 'app-maze',
@@ -29,22 +28,16 @@ export class MazeComponent implements OnInit, OnDestroy {
       Sketch.p5 = p5sketch;
       let canvas;
       let windowOffset;
-      let maze;
       let player;
 
       // Setup P5 js
       p5sketch.setup = () => {
         windowOffset = 100;
         canvas = p5sketch.createCanvas(p5sketch.windowWidth, p5sketch.windowHeight - windowOffset);
-        maze = new Maze({
-          width: p5sketch.windowWidth,
-          height: p5sketch.windowHeight - windowOffset,
-          cellSize: 25
-        });
         player = new MazePlayer({
-          size: new Vector({x: maze.cellSize / 2}),
+          size: new Vector({x: 10}),
           maxSpeed: new Vector({x: 10, y: 10}),
-          position: new Vector({x: maze.width / 2, y: maze.height / 2})
+          position: new Vector({x: p5sketch.windowWidth / 2, y: p5sketch.windowHeight / 2})
         });
       };
 
@@ -58,7 +51,6 @@ export class MazeComponent implements OnInit, OnDestroy {
         p5sketch.background(Theme.bgColor.x, Theme.bgColor.y, Theme.bgColor.z);
         player.move();
         player.display();
-        // maze.display();
         Sketch.showFPS();
       };
     };
