@@ -22,11 +22,15 @@ export class Strand extends CanvasObject {
 
   // Randomize Movements On A Random Interval That Continues To Change
   randomizeMovements() {
+    this.stopRandomMovements();
     this.randomizeSpeed();
+    this.randomMovementTimeout = setTimeout(() => {this.randomizeMovements(); }, Math.floor(Sketch.p5.random(200, 800)));
+  }
+
+  stopRandomMovements() {
     if (this.randomMovementTimeout != null) {
       clearTimeout(this.randomMovementTimeout);
     }
-    this.randomMovementTimeout = setTimeout(() => {this.randomizeMovements(); }, Math.floor(Sketch.p5.random(200, 800)));
   }
 
   // Display Strand With Glow

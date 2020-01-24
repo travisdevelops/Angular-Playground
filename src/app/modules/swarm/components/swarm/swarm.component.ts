@@ -70,13 +70,19 @@ export class SwarmComponent implements OnInit, OnDestroy {
         this.mazeCellManager.addMazeCell({col: 5, row: 4, bottom: true, right: true});
         this.mazeCellManager.addMazeCell({col: 6, row: 3, bottom: true, top: true, right: true});
 
+      // Fake Cells
+        this.mazeCellManager.addMazeCell({col: 1, row: 1});
+        this.mazeCellManager.addMazeCell({col: 2, row: 3});
+        this.mazeCellManager.addMazeCell({col: 3, row: 3});
+        this.mazeCellManager.addMazeCell({col: 5, row: 3});
+
         // Strand Entrances
         this.mazeCellManager.addSpawnPoint({col: 0, row: 1});
         this.mazeCellManager.addSpawnPoint({col: 6, row: 3});
         this.mazeCellManager.addSpawnPoint({col: 3, row: 3});
 
-        this.mazeCellManager.createStrands(50, new Vector({x: 188, y: 254, z: 0}));
-        this.mazeCellManager.createAttackers(50, new Vector({x: 226, y: 112, z: 58}));
+        this.mazeCellManager.createStrands(2, new Vector({x: 188, y: 254, z: 0}));
+        this.mazeCellManager.createAttackers(1, new Vector({x: 226, y: 112, z: 58}));
       };
 
       // Draw P5 js
