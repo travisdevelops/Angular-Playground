@@ -34,7 +34,6 @@ export class SwarmComponent implements OnInit, OnDestroy {
       p5sketch.setup = () => {
         Sketch.windowOffset = 100;
         Sketch.canvas = p5sketch.createCanvas(0, 0);
-      console.log('test');
         // Strand Containers
         this.strandContainerManager = new StrandContainerManager();
         /*this.strandContainerManager.addStrandContainer({ size: new Vector({x: 150, y: 30}),

@@ -72,6 +72,7 @@ export class Strand extends CanvasObject {
     this.saveLastPosition();
   }
 
+
   // Save Last Position As First In Array
   // Always Keeps At Least 1 Vector Of Position in Array
   saveLastPosition() {

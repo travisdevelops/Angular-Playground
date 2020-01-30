@@ -3,6 +3,7 @@ import {Sketch} from '@classes/sketch';
 import {Cell, MazeCell} from '@app/modules/swarm/classes/maze-cell';
 import {Strand} from '@app/modules/swarm/classes/strand';
 import {AttackerStrand} from '@app/modules/swarm/classes/attacker-strand';
+import {CanvasObject} from '@classes/canvas-object';
 
 export class MazeCellManager {
   private mazeCells: MazeCell[] = [];
@@ -14,211 +15,26 @@ export class MazeCellManager {
   private attackerStrands: AttackerStrand[] = [];
   private spawnPoints: Cell[] = [];
   private attackerStrandVisionLength: number;
+  private attackerStrandVisionMinLength: number;
+  private strandVisionLength: number;
 
   constructor({gridSpacing = 120, color = new Vector(), position = new Vector(), debug = false} = {}) {
     this.gridSpacing = gridSpacing;
     this.color = color;
     this.position = position;
     this.debug = debug;
+    this.attackerStrandVisionMinLength = this.gridSpacing * 0.4;
     this.attackerStrandVisionLength = this.gridSpacing * 0.75;
+    this.strandVisionLength = this.gridSpacing * 0.85;
   }
 
-  static getAngleBetweenPoints(cx, cy, ex, ey): number {
-    const dy = ey - cy;
-    const dx = ex - cx;
-    let theta = Math.atan2(dy, dx); // range (-PI, PI]
-    theta *= 180 / Math.PI; // rads to degs, range (-180, 180]
-    if (theta < 0) { theta = 360 + theta; } // range [0, 360)
-    return theta;
-  }
-
-  static getDifferenceInPositions(positionA: Vector, positionB: Vector): Vector {
-    const xDif = Sketch.p5.abs(positionA.x - positionB.x);
-    const yDif = Sketch.p5.abs(positionA.y - positionB.y);
-    return new Vector({x: xDif, y: yDif});
-  }
-
-  display(): void {
-    this.mazeCells.forEach((mazeCell: MazeCell) => {
-      const mazeCellPosition = this.convertColRowToPosition(mazeCell);
-      this.displayMazeCell(mazeCell, mazeCellPosition);
-      if (this.debug) {
-        this.debugMode(mazeCell, mazeCellPosition);
-      }
-      this.getSpeedAwayFromAttacker(mazeCell, mazeCellPosition);
-    });
-  }
-
-  displayMazeCell(mazeCell: MazeCell, mazeCellPosition: Vector): void {
-    Sketch.p5.noFill();
-    Sketch.p5.strokeWeight(5);
-    Sketch.p5.stroke(this.color.x, this.color.y, this.color.z);
-    Sketch.p5.beginShape(Sketch.p5.LINES);
-    if (mazeCell.top) {
-      Sketch.p5.vertex(mazeCellPosition.x, mazeCellPosition.y);
-      Sketch.p5.vertex(mazeCellPosition.x + this.gridSpacing, mazeCellPosition.y);
-    }
-    if (mazeCell.right) {
-      Sketch.p5.vertex(mazeCellPosition.x + this.gridSpacing, mazeCellPosition.y);
-      Sketch.p5.vertex(mazeCellPosition.x + this.gridSpacing, mazeCellPosition.y + this.gridSpacing);
-    }
-    if (mazeCell.bottom) {
-      Sketch.p5.vertex(mazeCellPosition.x, mazeCellPosition.y + this.gridSpacing);
-      Sketch.p5.vertex(mazeCellPosition.x + this.gridSpacing, mazeCellPosition.y + this.gridSpacing);
-    }
-    if (mazeCell.left) {
-      Sketch.p5.vertex(mazeCellPosition.x, mazeCellPosition.y);
-      Sketch.p5.vertex(mazeCellPosition.x, mazeCellPosition.y + this.gridSpacing);
-    }
-    Sketch.p5.endShape();
-  }
-
-  getSpeedAwayFromAttacker(mazeCell: MazeCell, mazeCellPosition: Vector) {
-    // Get All Attacker Strands In Cell
-    const attackerStrandsInCell = this.attackerStrands.filter((attackerStrand: AttackerStrand) => {
-      return this.positionIsInsideCell(mazeCellPosition, attackerStrand.position);
-    });
-    // Get All Strands In Cell
-    const strandsInCell = this.strands.filter((strand: Strand) => {
-      return this.positionIsInsideCell(mazeCellPosition, strand.position);
-    });
-
-    if (attackerStrandsInCell.length === 0 && strandsInCell.length > 0) { // Only Strands In Cell
-      this.moveStrandsInsideCell(strandsInCell);
-    } else if (strandsInCell.length === 0 && attackerStrandsInCell.length > 0) { // Only Attackers In Cell
-      this.moveStrandsInsideCell(attackerStrandsInCell);
-    } else {
-      attackerStrandsInCell.forEach((attackerStrand: AttackerStrand) => {
-        let closestStrand: Strand = null;
-        let smallestDiff: Vector = null;
-        strandsInCell.forEach((strand: Strand) => {
-          const xyDif = MazeCellManager.getDifferenceInPositions(attackerStrand.position, strand.position);
-          if (this.debug) {
-            this.drawLineBetweenStrands(attackerStrand, strand, xyDif);
-          }
-          if (closestStrand == null || (xyDif.x <= smallestDiff.x && xyDif.y <= smallestDiff.y)) {
-            smallestDiff = xyDif;
-            closestStrand = strand;
-          }
-          this.moveStrandInsideCellAwayFromAttackerStrand(strand, attackerStrand);
-          strand.display();
-        });
-        if (closestStrand != null) {
-          this.moveAttackerStrandInsideCellTowardsStrand(attackerStrand, closestStrand);
-        } else {
-          this.moveStrandInsideCell(attackerStrand);
-        }
-      });
-    }
-  }
-
-  // Strand Potential Position Should Be Opposite Direction of Attacker Strand Current Position
-  moveStrandInsideCellAwayFromAttackerStrand(strand: Strand, attackerStrand: AttackerStrand): void {
-    const strandPotentialPos = strand.getPositionUsingSpeed();
-    const currentAngle = MazeCellManager.getAngleBetweenPoints(attackerStrand.position.x, attackerStrand.position.y,
-      strand.position.x, strand.position.y);
-    const potentialAngle = MazeCellManager.getAngleBetweenPoints(attackerStrand.position.x, attackerStrand.position.y,
-      strandPotentialPos.x, strandPotentialPos.y);
-    const currentAngleRangeLowerMax = currentAngle - 90;
-    const currentAngleRangeHigherMin = currentAngle + 90;
-    const withinAngleRange = potentialAngle <= currentAngleRangeLowerMax || potentialAngle >= currentAngleRangeHigherMin;
-    if (withinAngleRange && !this.positionIsCrossingCellBorders(strand.position, strandPotentialPos)) {
-      strand.move();
-    } else {
-      strand.randomizeSpeed();
-      // TODO: Check If Distance Is Greater For Potential Position If Not Its Moving Toward
-      // this.moveStrandInsideCellAwayFromAttackerStrand(strand, attackerStrand);
-    }
-    strand.display();
-  }
-
-  // Attacker Strand Potential Position Should Be Same Direction of Strand Current Position
-  moveAttackerStrandInsideCellTowardsStrand(strand: Strand, attackerStrand: AttackerStrand): void {
-    const attackerStrandPotentialPos = attackerStrand.getPositionUsingSpeed();
-    const currentAngle = MazeCellManager.getAngleBetweenPoints(attackerStrand.position.x, attackerStrand.position.y,
-      strand.position.x, strand.position.y);
-    const potentialAngle = MazeCellManager.getAngleBetweenPoints(attackerStrandPotentialPos.x, attackerStrandPotentialPos.y,
-      strand.position.x, strand.position.y);
-    const currentAngleRangeLowerMax = currentAngle - 90;
-    const currentAngleRangeHigherMin = currentAngle + 90;
-    const withinAngleRange = potentialAngle >= currentAngleRangeLowerMax && potentialAngle <= currentAngleRangeHigherMin;
-    if (withinAngleRange && !this.positionIsCrossingCellBorders(attackerStrand.position, attackerStrandPotentialPos)) {
-      attackerStrand.move();
-    } else {
-      attackerStrand.randomizeSpeed();
-      // TODO: Check If Distance Is Greater For Potential Position If Not Its Moving Toward
-      // this.moveAttackerStrandInsideCellTowardsStrand(strand, attackerStrand);
-    }
-    attackerStrand.display();
-  }
-
-  moveStrandsInsideCell(strands: Strand[]): void {
-    strands.forEach((strand: Strand) => {
-      this.moveStrandInsideCell(strand);
-    });
-  }
-
-  moveStrandInsideCell(strand: Strand): void {
-    if (!this.positionIsCrossingCellBorders(strand.position, strand.getPositionUsingSpeed())) {
-      strand.move();
-    } else {
-      strand.randomizeSpeed();
-    }
-    strand.display();
-  }
-
-  drawLineBetweenStrands(attackStrand: AttackerStrand, strand: Strand, xyDif: Vector): void {
-    if (xyDif.x <= this.attackerStrandVisionLength && xyDif.y <= this.attackerStrandVisionLength) {
-      Sketch.p5.stroke(235, 120, 112);
-      Sketch.p5.line(attackStrand.position.x, attackStrand.position.y, strand.position.x, strand.position.y);
-    }
-  }
-
-  debugMode(mazeCell, mazeCellPosition): void {
-    Sketch.p5.strokeWeight(1);
-    const textOffset = 5;
-    if (mazeCell.top) {
-      Sketch.p5.textAlign(Sketch.p5.CENTER, Sketch.p5.TOP);
-      Sketch.p5.text('Top', mazeCellPosition.x + (this.gridSpacing / 2), mazeCellPosition.y + textOffset);
-    }
-    if (mazeCell.right) {
-      Sketch.p5.textAlign(Sketch.p5.RIGHT, Sketch.p5.CENTER);
-      Sketch.p5.text('Right', mazeCellPosition.x + this.gridSpacing - textOffset, mazeCellPosition.y + (this.gridSpacing / 2));
-    }
-    if (mazeCell.bottom) {
-      Sketch.p5.textAlign(Sketch.p5.CENTER, Sketch.p5.BOTTOM);
-      Sketch.p5.text('Bottom', mazeCellPosition.x + (this.gridSpacing / 2), mazeCellPosition.y + this.gridSpacing - textOffset + 2);
-    }
-    if (mazeCell.left) {
-      Sketch.p5.textAlign(Sketch.p5.LEFT, Sketch.p5.CENTER);
-      Sketch.p5.text('Left', mazeCellPosition.x + textOffset, mazeCellPosition.y + (this.gridSpacing / 2));
-    }
-    Sketch.p5.textAlign(Sketch.p5.CENTER, Sketch.p5.CENTER);
-    Sketch.p5.text('(' + mazeCell.col + ',' + mazeCell.row + ')', mazeCellPosition.x + (this.gridSpacing / 2), mazeCellPosition.y + (this.gridSpacing / 2));
-  }
-
-  convertColRowToPosition(cell: Cell) {
-    return new Vector({x: this.position.x + (this.gridSpacing * cell.col), y: this.position.y +
-        (this.gridSpacing * cell.row)});
-  }
-
-  convertPositionToColRow(position: Vector): Cell {
-    return new Cell({col: Math.floor((position.x - this.position.x) / this.gridSpacing),
-      row: Math.floor((position.y - this.position.y) / this.gridSpacing)});
-  }
-
+  // ------------------------------ Configuration ------------------------------
   addMazeCell(mazeCellParams): void {
-    this.mazeCells.push(new MazeCell(mazeCellParams));
+    this.mazeCells.push(new MazeCell({...mazeCellParams, rootPosition: this.position, gridSpacing: this.gridSpacing}));
   }
 
   addSpawnPoint(cellParams): void {
-    this.spawnPoints.push(new Cell(cellParams));
-  }
-
-  getCellByColAndRow(colRow): MazeCell {
-    return this.mazeCells.find((mazeCell: MazeCell) => {
-      return mazeCell.col === colRow.col && mazeCell.row === colRow.row;
-    });
+    this.spawnPoints.push(new Cell({...cellParams, rootPosition: this.position, gridSpacing: this.gridSpacing}));
   }
 
   // Create Strands
@@ -240,16 +56,108 @@ export class MazeCellManager {
     }
   }
 
-  // Get Position Inside Spawn Point
   getRandomSpawnPoint(): Vector {
     const randomSpawnPoint: number = this.spawnPoints.length > 1 ? Math.floor(Sketch.p5.random(0, this.spawnPoints.length)) : 0;
-    const cell: Cell = this.spawnPoints[randomSpawnPoint];
-    const entrancePosition: Vector = this.convertColRowToPosition(cell);
-    const xRangeL = entrancePosition.x;
-    const xRangeR = entrancePosition.x + this.gridSpacing;
-    const yRangeT = entrancePosition.y;
-    const yRangeB = entrancePosition.y + this.gridSpacing;
+    const selectedSpawnPoint: Cell = this.spawnPoints[randomSpawnPoint];
+    const xRangeL = selectedSpawnPoint.position.x;
+    const xRangeR = selectedSpawnPoint.position.x + this.gridSpacing;
+    const yRangeT = selectedSpawnPoint.position.y;
+    const yRangeB = selectedSpawnPoint.position.y + this.gridSpacing;
     return new Vector({x: Sketch.p5.random(xRangeL + 5, xRangeR - 5), y: Sketch.p5.random(yRangeT + 5, yRangeB - 5)});
+  }
+
+  // ------------------------------ Display & AI Behavior --------------------
+  display(): void {
+    this.mazeCells.forEach((mazeCell: MazeCell) => {
+      this.displayMazeCell(mazeCell);
+      this.displayStrandsWithAIBehavior(mazeCell);
+    });
+  }
+
+  displayMazeCell(mazeCell: MazeCell): void {
+    Sketch.p5.noFill();
+    Sketch.p5.strokeWeight(5);
+    Sketch.p5.stroke(this.color.x, this.color.y, this.color.z);
+    Sketch.p5.beginShape(Sketch.p5.LINES);
+    if (mazeCell.top) {
+      Sketch.p5.vertex(mazeCell.position.x, mazeCell.position.y);
+      Sketch.p5.vertex(mazeCell.position.x + this.gridSpacing, mazeCell.position.y);
+    }
+    if (mazeCell.right) {
+      Sketch.p5.vertex(mazeCell.position.x + this.gridSpacing, mazeCell.position.y);
+      Sketch.p5.vertex(mazeCell.position.x + this.gridSpacing, mazeCell.position.y + this.gridSpacing);
+    }
+    if (mazeCell.bottom) {
+      Sketch.p5.vertex(mazeCell.position.x, mazeCell.position.y + this.gridSpacing);
+      Sketch.p5.vertex(mazeCell.position.x + this.gridSpacing, mazeCell.position.y + this.gridSpacing);
+    }
+    if (mazeCell.left) {
+      Sketch.p5.vertex(mazeCell.position.x, mazeCell.position.y);
+      Sketch.p5.vertex(mazeCell.position.x, mazeCell.position.y + this.gridSpacing);
+    }
+    Sketch.p5.endShape();
+    if (this.debug) {
+      this.displayDebugMode(mazeCell);
+    }
+  }
+
+  displayDebugMode(mazeCell): void {
+    Sketch.p5.strokeWeight(1);
+    const textOffset = 5;
+    if (mazeCell.top) {
+      Sketch.p5.textAlign(Sketch.p5.CENTER, Sketch.p5.TOP);
+      Sketch.p5.text('Top', mazeCell.position.x + (this.gridSpacing / 2), mazeCell.position.y + textOffset);
+    }
+    if (mazeCell.right) {
+      Sketch.p5.textAlign(Sketch.p5.RIGHT, Sketch.p5.CENTER);
+      Sketch.p5.text('Right', mazeCell.position.x + this.gridSpacing - textOffset, mazeCell.position.y + (this.gridSpacing / 2));
+    }
+    if (mazeCell.bottom) {
+      Sketch.p5.textAlign(Sketch.p5.CENTER, Sketch.p5.BOTTOM);
+      Sketch.p5.text('Bottom', mazeCell.position.x + (this.gridSpacing / 2), mazeCell.position.y + this.gridSpacing - textOffset + 2);
+    }
+    if (mazeCell.left) {
+      Sketch.p5.textAlign(Sketch.p5.LEFT, Sketch.p5.CENTER);
+      Sketch.p5.text('Left', mazeCell.position.x + textOffset, mazeCell.position.y + (this.gridSpacing / 2));
+    }
+    Sketch.p5.textAlign(Sketch.p5.CENTER, Sketch.p5.CENTER);
+    Sketch.p5.text('(' + mazeCell.col + ',' + mazeCell.row + ')', mazeCell.position.x + (this.gridSpacing / 2), mazeCell.position.y + (this.gridSpacing / 2));
+  }
+
+  displayStrandsWithAIBehavior(mazeCell: MazeCell) {
+    // Get All Attacker Strands In Cell
+    const attackerStrandsInCell = this.attackerStrands.filter((attackerStrand: AttackerStrand) => {
+      return this.positionIsInsideCell(mazeCell.position, attackerStrand.position);
+    });
+    // Get All Strands In Cell
+    const strandsInCell = this.strands.filter((strand: Strand) => {
+      return this.positionIsInsideCell(mazeCell.position, strand.position);
+    });
+
+    if (attackerStrandsInCell.length === 0 && strandsInCell.length > 0) { // Only Strands In Cell
+      this.moveStrandsInsideCell(strandsInCell);
+    } else if (strandsInCell.length === 0 && attackerStrandsInCell.length > 0) { // Only Attackers In Cell
+      this.moveStrandsInsideCell(attackerStrandsInCell);
+    } else {
+      // Make Attackers Move Towards The Closest Strand in Cell
+      attackerStrandsInCell.forEach((attackerStrand: AttackerStrand) => {
+        const closestStrand: Strand = this.getClosestStrandToAttacker(attackerStrand, strandsInCell);
+        if (closestStrand != null) {
+          this.moveAttackerStrandInsideCellTowardsStrand(attackerStrand, closestStrand);
+        } else {
+          this.moveStrandRandomly(attackerStrand);
+        }
+      });
+      // Make Strands Move Away From The Closest Strand in Cell
+      strandsInCell.forEach((strand: Strand) => {
+        const closestAttacker: AttackerStrand = this.getClosestAttackerToStrand(strand, attackerStrandsInCell);
+        if (closestAttacker != null) {
+          this.moveStrandInsideCellAwayFromAttackerStrand(strand, closestAttacker);
+        } else {
+          this.moveStrandRandomly(strand);
+        }
+      });
+    }
   }
 
   positionIsInsideCell(cellPosition: Vector, strandPosition: Vector): boolean {
@@ -259,16 +167,122 @@ export class MazeCellManager {
       strandPosition.x < cellPosition.x + this.gridSpacing;
   }
 
+  getClosestStrandToAttacker(attackerStrand: AttackerStrand, strands: Strand[]): Strand {
+    let closestStrand: Strand = null;
+    let smallestDistance: Vector = null;
+    strands.forEach((strand: Strand) => {
+      const distance = Sketch.p5.dist(attackerStrand.position.x, attackerStrand.position.y, strand.position.x, strand.position.y);
+      if (closestStrand == null || (distance > this.attackerStrandVisionMinLength && distance <= this.attackerStrandVisionLength && distance <= smallestDistance)) {
+        smallestDistance = distance;
+        closestStrand = strand;
+      }
+    });
+    if (this.debug && closestStrand != null) {
+      Sketch.p5.stroke(235, 120, 112);
+      Sketch.p5.line(attackerStrand.position.x, attackerStrand.position.y, closestStrand.position.x, closestStrand.position.y);
+    }
+    return closestStrand;
+  }
+
+  getClosestAttackerToStrand(strand: Strand, attackerStrands: AttackerStrand[]): AttackerStrand {
+    let closestAttacker: AttackerStrand = null;
+    let smallestDistance: Vector = null;
+    attackerStrands.forEach((attackerStrand: AttackerStrand) => {
+      const distance = Sketch.p5.dist(strand.position.x, strand.position.y, attackerStrand.position.x, attackerStrand.position.y);
+      if (closestAttacker == null || (distance <= this.strandVisionLength && distance <= smallestDistance)) {
+        smallestDistance = distance;
+        closestAttacker = attackerStrand;
+      }
+    });
+    return closestAttacker;
+  }
+
+  moveAttackerStrandInsideCellTowardsStrand(attackerStrand: AttackerStrand, strand: Strand): void {
+    let attackerStrandPotentialPos = null, currentDistance = 0, potentialDistance = 1;
+    while (potentialDistance > currentDistance) {
+      // attackerStrand.speed = this.getSpeedInsideBorder(attackerStrand);
+      attackerStrand.setSpeedTowardsPosition(strand.position);
+      attackerStrandPotentialPos = attackerStrand.getPositionUsingSpeed();
+      currentDistance = Sketch.p5.dist(strand.position.x, strand.position.y,
+        attackerStrand.position.x, attackerStrand.position.y);
+      potentialDistance = Sketch.p5.dist(strand.position.x, strand.position.y,
+        attackerStrandPotentialPos.x, attackerStrandPotentialPos.y);
+    }
+    attackerStrand.move();
+    attackerStrand.display();
+    /*if (potentialDistance <= currentDistance) {
+      attackerStrand.move();
+      attackerStrand.display();
+    } else {
+      attackerStrand.setSpeedTowardsPosition(strand.position);
+      this.moveAttackerStrandInsideCellTowardsStrand(attackerStrand, strand);
+    }*/
+  }
+
+  moveStrandInsideCellAwayFromAttackerStrand(strand: Strand, attackerStrand: AttackerStrand): void {
+    let strandPotentialPos = null, currentDistance = 0, potentialDistance = 1;
+    while (potentialDistance < currentDistance) {
+      // strand.speed = this.getSpeedInsideBorder(strand);
+      strand.setSpeedAwayFromPosition(attackerStrand.position);
+      strandPotentialPos = strand.getPositionUsingSpeed();
+      currentDistance = Sketch.p5.dist(attackerStrand.position.x, attackerStrand.position.y, strand.position.x,
+        strand.position.y);
+      potentialDistance = Sketch.p5.dist(attackerStrand.position.x, attackerStrand.position.y,
+        strandPotentialPos.x, strandPotentialPos.y);
+    }
+    strand.move();
+    strand.display();
+
+    /*strand.speed = this.getSpeedInsideBorder(strand);
+    const strandPotentialPos = strand.getPositionUsingSpeed();
+    const currentDistance = Sketch.p5.dist(attackerStrand.position.x, attackerStrand.position.y, strand.position.x,
+      strand.position.y);
+    const potentialDistance = Sketch.p5.dist(attackerStrand.position.x, attackerStrand.position.y,
+      strandPotentialPos.x, strandPotentialPos.y);
+
+    if (potentialDistance <= currentDistance) {
+      strand.move();
+      strand.display();
+    } else {
+      strand.setSpeedAwayFromPosition(attackerStrand.position);
+      this.moveStrandInsideCellAwayFromAttackerStrand(strand, attackerStrand);
+    }*/
+  }
+
+  getSpeedInsideBorder(attackerStrand) {
+    /*if (!this.positionIsCrossingCellBorders(attackerStrand.position, attackerStrand.getPositionUsingSpeed())) {
+      return attackerStrand.speed;
+    }
+    attackerStrand.randomizeSpeed();
+    return this.getSpeedInsideBorder(attackerStrand);*/
+    while (this.positionIsCrossingCellBorders(attackerStrand.position, attackerStrand.getPositionUsingSpeed())) {
+      attackerStrand.randomizeSpeed();
+    }
+    return attackerStrand.speed;
+  }
+
+  moveStrandsInsideCell(strands: Strand[]): void {
+    strands.forEach((strand: Strand) => {
+      this.moveStrandRandomly(strand);
+    });
+  }
+
+  moveStrandRandomly(strand: Strand): void {
+    strand.speed = this.getSpeedInsideBorder(strand);
+    strand.move();
+    strand.display();
+  }
+
+  // ------------------------------ Wall Cell Crossing Borders ------------------------------
   // Check If Strand Position is Crossing Any Borders
   positionIsCrossingCellBorders(currentPosition, potentialPosition): boolean {
     const currentCell: Cell = this.convertPositionToColRow(currentPosition);
-    const currentCellPosition = this.convertColRowToPosition(currentCell);
 
     // Get Current Direction
-    const headingTowardsTopOfCell = potentialPosition.y < currentCellPosition.y;
-    const headingTowardsBottomOfCell = potentialPosition.y > currentCellPosition.y + this.gridSpacing;
-    const headingTowardsLeftOfCell = potentialPosition.x < currentCellPosition.x;
-    const headingTowardsRightOfCell = potentialPosition.x > currentCellPosition.x + this.gridSpacing;
+    const headingTowardsTopOfCell = potentialPosition.y < currentCell.position.y;
+    const headingTowardsBottomOfCell = potentialPosition.y > currentCell.position.y + this.gridSpacing;
+    const headingTowardsLeftOfCell = potentialPosition.x < currentCell.position.x;
+    const headingTowardsRightOfCell = potentialPosition.x > currentCell.position.x + this.gridSpacing;
 
     if (this.positionIsCrossingCurrentCellBorders(currentCell, headingTowardsTopOfCell, headingTowardsBottomOfCell, headingTowardsLeftOfCell, headingTowardsRightOfCell)) {
       return true;
@@ -327,5 +341,23 @@ export class MazeCellManager {
       rightNeighbor != null && bottomNeighbor.right && rightNeighbor.bottom;
     return outsideTopLeftCorner || outsideTopRightCorner || outsideBottomLeftCorner || outsideBottomRightCorner;
   }
+
+  // ------------------------------ Helpers ------------------------------
+  convertPositionToColRow(position: Vector): Cell {
+    return new Cell({col: Math.floor((position.x - this.position.x) / this.gridSpacing),
+      row: Math.floor((position.y - this.position.y) / this.gridSpacing), rootPosition: this.position, gridSpacing: this.gridSpacing});
+  }
+
+  getCellByColAndRow(colRow): MazeCell {
+    return this.mazeCells.find((mazeCell: MazeCell) => {
+      return mazeCell.col === colRow.col && mazeCell.row === colRow.row;
+    });
+  }
+
+
+
+
+
+
 
 }
