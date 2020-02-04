@@ -3,29 +3,24 @@ import {Sketch} from '@classes/sketch';
 import {Cell, MazeCell} from '@app/modules/swarm/classes/maze-cell';
 import {Strand} from '@app/modules/swarm/classes/strand';
 import {AttackerStrand} from '@app/modules/swarm/classes/attacker-strand';
-import {CanvasObject} from '@classes/canvas-object';
 
 export class MazeCellManager {
   private mazeCells: MazeCell[] = [];
   private gridSpacing: number;
+  private mazeBorderWidth: number;
   private color: Vector;
   private position: Vector;
   private debug: boolean;
   private strands: Strand[] = [];
   private attackerStrands: AttackerStrand[] = [];
   private spawnPoints: Cell[] = [];
-  private attackerStrandVisionLength: number;
-  private attackerStrandVisionMinLength: number;
-  private strandVisionLength: number;
 
-  constructor({gridSpacing = 120, color = new Vector(), position = new Vector(), debug = false} = {}) {
+  constructor({gridSpacing = 120, mazeBorderWidth = 5, color = new Vector(), position = new Vector(), debug = false} = {}) {
     this.gridSpacing = gridSpacing;
     this.color = color;
     this.position = position;
+    this.mazeBorderWidth = mazeBorderWidth;
     this.debug = debug;
-    this.attackerStrandVisionMinLength = this.gridSpacing * 0.4;
-    this.attackerStrandVisionLength = this.gridSpacing * 0.75;
-    this.strandVisionLength = this.gridSpacing * 0.85;
   }
 
   // ------------------------------ Configuration ------------------------------
@@ -63,7 +58,7 @@ export class MazeCellManager {
     const xRangeR = selectedSpawnPoint.position.x + this.gridSpacing;
     const yRangeT = selectedSpawnPoint.position.y;
     const yRangeB = selectedSpawnPoint.position.y + this.gridSpacing;
-    return new Vector({x: Sketch.p5.random(xRangeL + 5, xRangeR - 5), y: Sketch.p5.random(yRangeT + 5, yRangeB - 5)});
+    return new Vector({x: Sketch.p5.random(xRangeL + this.mazeBorderWidth, xRangeR - this.mazeBorderWidth), y: Sketch.p5.random(yRangeT + this.mazeBorderWidth, yRangeB - this.mazeBorderWidth)});
   }
 
   // ------------------------------ Display & AI Behavior --------------------
@@ -76,7 +71,7 @@ export class MazeCellManager {
 
   displayMazeCell(mazeCell: MazeCell): void {
     Sketch.p5.noFill();
-    Sketch.p5.strokeWeight(5);
+    Sketch.p5.strokeWeight(this.mazeBorderWidth);
     Sketch.p5.stroke(this.color.x, this.color.y, this.color.z);
     Sketch.p5.beginShape(Sketch.p5.LINES);
     if (mazeCell.top) {
@@ -172,7 +167,7 @@ export class MazeCellManager {
     let smallestDistance: Vector = null;
     strands.forEach((strand: Strand) => {
       const distance = Sketch.p5.dist(attackerStrand.position.x, attackerStrand.position.y, strand.position.x, strand.position.y);
-      if (closestStrand == null || (distance > this.attackerStrandVisionMinLength && distance <= this.attackerStrandVisionLength && distance <= smallestDistance)) {
+      if (distance <= attackerStrand.visionRadius && (distance < smallestDistance || smallestDistance == null)) {
         smallestDistance = distance;
         closestStrand = strand;
       }
@@ -189,7 +184,7 @@ export class MazeCellManager {
     let smallestDistance: Vector = null;
     attackerStrands.forEach((attackerStrand: AttackerStrand) => {
       const distance = Sketch.p5.dist(strand.position.x, strand.position.y, attackerStrand.position.x, attackerStrand.position.y);
-      if (closestAttacker == null || (distance <= this.strandVisionLength && distance <= smallestDistance)) {
+      if (distance <= strand.visionRadius && (distance < smallestDistance || smallestDistance == null)) {
         smallestDistance = distance;
         closestAttacker = attackerStrand;
       }
@@ -198,68 +193,34 @@ export class MazeCellManager {
   }
 
   moveAttackerStrandInsideCellTowardsStrand(attackerStrand: AttackerStrand, strand: Strand): void {
-    let attackerStrandPotentialPos = null, currentDistance = 0, potentialDistance = 1;
-    while (potentialDistance > currentDistance) {
-      // attackerStrand.speed = this.getSpeedInsideBorder(attackerStrand);
-      attackerStrand.setSpeedTowardsPosition(strand.position);
-      attackerStrandPotentialPos = attackerStrand.getPositionUsingSpeed();
-      currentDistance = Sketch.p5.dist(strand.position.x, strand.position.y,
-        attackerStrand.position.x, attackerStrand.position.y);
-      potentialDistance = Sketch.p5.dist(strand.position.x, strand.position.y,
-        attackerStrandPotentialPos.x, attackerStrandPotentialPos.y);
-    }
+    const currentDistance = Sketch.p5.dist(strand.position.x, strand.position.y,
+      attackerStrand.position.x, attackerStrand.position.y);
+    attackerStrand.setSpeedTowardsPosition(strand.position);
+    const attackerStrandPotentialPos = attackerStrand.getPositionUsingSpeed();
+    const potentialDistance = Sketch.p5.dist(strand.position.x, strand.position.y,
+      attackerStrandPotentialPos.x, attackerStrandPotentialPos.y);
+  if (potentialDistance > currentDistance) {
+    console.log('Not Moving Towards Strand');
+  }
+    attackerStrand.speed = this.getSpeedInsideBorder(attackerStrand); // Make Sure Speed is Inside Border
     attackerStrand.move();
     attackerStrand.display();
-    /*if (potentialDistance <= currentDistance) {
-      attackerStrand.move();
-      attackerStrand.display();
-    } else {
-      attackerStrand.setSpeedTowardsPosition(strand.position);
-      this.moveAttackerStrandInsideCellTowardsStrand(attackerStrand, strand);
-    }*/
   }
 
   moveStrandInsideCellAwayFromAttackerStrand(strand: Strand, attackerStrand: AttackerStrand): void {
-    let strandPotentialPos = null, currentDistance = 0, potentialDistance = 1;
-    while (potentialDistance < currentDistance) {
-      // strand.speed = this.getSpeedInsideBorder(strand);
-      strand.setSpeedAwayFromPosition(attackerStrand.position);
-      strandPotentialPos = strand.getPositionUsingSpeed();
-      currentDistance = Sketch.p5.dist(attackerStrand.position.x, attackerStrand.position.y, strand.position.x,
-        strand.position.y);
-      potentialDistance = Sketch.p5.dist(attackerStrand.position.x, attackerStrand.position.y,
-        strandPotentialPos.x, strandPotentialPos.y);
+    let currentDistance = Sketch.p5.dist(attackerStrand.position.x, attackerStrand.position.y, strand.position.x, strand.position.y);
+    strand.setSpeedAwayFromPosition(attackerStrand.position);
+    let strandPotentialPos = strand.getPositionUsingSpeed();
+    let potentialDistance = Sketch.p5.dist(attackerStrand.position.x, attackerStrand.position.y,
+      strandPotentialPos.x, strandPotentialPos.y);
+    if (potentialDistance < currentDistance) {
+      console.log('Not Moving Away From Strand');
     }
+    strand.speed = this.getSpeedInsideBorder(strand); // Make Sure Speed is Inside Border
     strand.move();
     strand.display();
-
-    /*strand.speed = this.getSpeedInsideBorder(strand);
-    const strandPotentialPos = strand.getPositionUsingSpeed();
-    const currentDistance = Sketch.p5.dist(attackerStrand.position.x, attackerStrand.position.y, strand.position.x,
-      strand.position.y);
-    const potentialDistance = Sketch.p5.dist(attackerStrand.position.x, attackerStrand.position.y,
-      strandPotentialPos.x, strandPotentialPos.y);
-
-    if (potentialDistance <= currentDistance) {
-      strand.move();
-      strand.display();
-    } else {
-      strand.setSpeedAwayFromPosition(attackerStrand.position);
-      this.moveStrandInsideCellAwayFromAttackerStrand(strand, attackerStrand);
-    }*/
   }
 
-  getSpeedInsideBorder(attackerStrand) {
-    /*if (!this.positionIsCrossingCellBorders(attackerStrand.position, attackerStrand.getPositionUsingSpeed())) {
-      return attackerStrand.speed;
-    }
-    attackerStrand.randomizeSpeed();
-    return this.getSpeedInsideBorder(attackerStrand);*/
-    while (this.positionIsCrossingCellBorders(attackerStrand.position, attackerStrand.getPositionUsingSpeed())) {
-      attackerStrand.randomizeSpeed();
-    }
-    return attackerStrand.speed;
-  }
 
   moveStrandsInsideCell(strands: Strand[]): void {
     strands.forEach((strand: Strand) => {
@@ -271,6 +232,14 @@ export class MazeCellManager {
     strand.speed = this.getSpeedInsideBorder(strand);
     strand.move();
     strand.display();
+  }
+
+
+  getSpeedInsideBorder(strand: Strand) {
+    while (this.positionIsCrossingCellBorders(strand.position, strand.getPositionUsingSpeed())) {
+      strand.randomizeSpeed();
+    }
+    return strand.speed;
   }
 
   // ------------------------------ Wall Cell Crossing Borders ------------------------------

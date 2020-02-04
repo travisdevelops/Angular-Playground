@@ -82,9 +82,24 @@ export class CanvasObject {
   }
 
   setSpeedTowardsPosition(position: Vector): void {
-    this.speed = CanvasObject.getPositionDifference(position, this.position);
+    const speedTowardsPosition = CanvasObject.getPositionDifference(position, this.position);
+    const newSpeed = new Vector();
+    // Calculate X
+    if (speedTowardsPosition.x > 0) { // X is Positive
+      newSpeed.x = Sketch.p5.random(this.minSpeed.x, this.maxSpeed.x);
+    } else { // X is Negative
+      newSpeed.x = Sketch.p5.random(-this.minSpeed.x, -this.maxSpeed.x);
+    }
+    // Calculate Y
+    if (speedTowardsPosition.y > 0) { // Y is Positive
+      newSpeed.y = Sketch.p5.random(this.minSpeed.y, this.maxSpeed.y);
+    } else { // Y is Negative
+      newSpeed.y = Sketch.p5.random(-this.minSpeed.y, -this.maxSpeed.y);
+    }
+    this.speed = newSpeed;
   }
 
+  // TODO: Limit Direction To a 90 deg angle instead of 180 to ensure new direction has less distance
   setSpeedAwayFromPosition(position: Vector): void {
     const speedTowardsPosition = CanvasObject.getPositionDifference(position, this.position);
     const newSpeed = new Vector();
