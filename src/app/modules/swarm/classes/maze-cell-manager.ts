@@ -119,6 +119,7 @@ export class MazeCellManager {
     Sketch.p5.text('(' + mazeCell.col + ',' + mazeCell.row + ')', mazeCell.position.x + (this.gridSpacing / 2), mazeCell.position.y + (this.gridSpacing / 2));
   }
 
+  // TODO: Checking Strand Collisions Fail When They Are in Adjacent Maze Cells, Doesnt Work If Strands are not in a cell
   displayStrandsWithAIBehavior(mazeCell: MazeCell) {
     // Get All Attacker Strands In Cell
     const attackerStrandsInCell = this.attackerStrands.filter((attackerStrand: AttackerStrand) => {
@@ -199,19 +200,19 @@ export class MazeCellManager {
     const attackerStrandPotentialPos = attackerStrand.getPositionUsingSpeed();
     const potentialDistance = Sketch.p5.dist(strand.position.x, strand.position.y,
       attackerStrandPotentialPos.x, attackerStrandPotentialPos.y);
-  if (potentialDistance > currentDistance) {
-    console.log('Not Moving Towards Strand');
-  }
+    if (potentialDistance > currentDistance) {
+      console.log('Not Moving Towards Strand');
+    }
     attackerStrand.speed = this.getSpeedInsideBorder(attackerStrand); // Make Sure Speed is Inside Border
     attackerStrand.move();
     attackerStrand.display();
   }
 
   moveStrandInsideCellAwayFromAttackerStrand(strand: Strand, attackerStrand: AttackerStrand): void {
-    let currentDistance = Sketch.p5.dist(attackerStrand.position.x, attackerStrand.position.y, strand.position.x, strand.position.y);
+    const currentDistance = Sketch.p5.dist(attackerStrand.position.x, attackerStrand.position.y, strand.position.x, strand.position.y);
     strand.setSpeedAwayFromPosition(attackerStrand.position);
-    let strandPotentialPos = strand.getPositionUsingSpeed();
-    let potentialDistance = Sketch.p5.dist(attackerStrand.position.x, attackerStrand.position.y,
+    const strandPotentialPos = strand.getPositionUsingSpeed();
+    const potentialDistance = Sketch.p5.dist(attackerStrand.position.x, attackerStrand.position.y,
       strandPotentialPos.x, strandPotentialPos.y);
     if (potentialDistance < currentDistance) {
       console.log('Not Moving Away From Strand');

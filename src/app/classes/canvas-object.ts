@@ -25,11 +25,6 @@ export class CanvasObject {
     const yDiff = positionA.y - positionB.y;
     return new Vector({x: xDiff, y: yDiff});
   }
-  static getPositionAbsoluteDifference(positionA: Vector, positionB: Vector): Vector {
-    const xDiff = Sketch.p5.abs(positionA.x - positionB.x);
-    const yDiff = Sketch.p5.abs(positionA.y - positionB.y);
-    return new Vector({x: xDiff, y: yDiff});
-  }
 
   get speed(): Vector {
     return this._speed;
@@ -81,57 +76,56 @@ export class CanvasObject {
       y: Sketch.p5.random(-this.maxSpeed.y, this.maxSpeed.y)});
   }
 
+  // TODO: Speed Towards Should Not Exceed Position Difference in order to prevent overshooting (Test Revision)
   setSpeedTowardsPosition(position: Vector): void {
     const speedTowardsPosition = CanvasObject.getPositionDifference(position, this.position);
     const newSpeed = new Vector();
+    const maxSpeed = new Vector(this.maxSpeed);
+    if (Math.abs(speedTowardsPosition.x) < Math.abs(this.maxSpeed.x)) {
+      maxSpeed.x = Math.abs(speedTowardsPosition.x);
+    }
+    if (Math.abs(speedTowardsPosition.y) < Math.abs(this.maxSpeed.y)) {
+      maxSpeed.y = Math.abs(speedTowardsPosition.y);
+    }
     // Calculate X
     if (speedTowardsPosition.x > 0) { // X is Positive
-      newSpeed.x = Sketch.p5.random(this.minSpeed.x, this.maxSpeed.x);
+      newSpeed.x = Sketch.p5.random(this.minSpeed.x, maxSpeed.x);
     } else { // X is Negative
-      newSpeed.x = Sketch.p5.random(-this.minSpeed.x, -this.maxSpeed.x);
+      newSpeed.x = Sketch.p5.random(-this.minSpeed.x, -maxSpeed.x);
     }
     // Calculate Y
     if (speedTowardsPosition.y > 0) { // Y is Positive
-      newSpeed.y = Sketch.p5.random(this.minSpeed.y, this.maxSpeed.y);
+      newSpeed.y = Sketch.p5.random(this.minSpeed.y, maxSpeed.y);
     } else { // Y is Negative
-      newSpeed.y = Sketch.p5.random(-this.minSpeed.y, -this.maxSpeed.y);
+      newSpeed.y = Sketch.p5.random(-this.minSpeed.y, -maxSpeed.y);
+    }
+    if (Math.abs(newSpeed.x) > Math.abs(speedTowardsPosition.x) || Math.abs(newSpeed.y) > Math.abs(speedTowardsPosition.y)) {
+      console.log('Moving Faster Than Distance');
     }
     this.speed = newSpeed;
   }
 
-  // TODO: Limit Direction To a 90 deg angle instead of 180 to ensure new direction has less distance
+  // Set Speed To Move in Opposite Direction/Quadrant of Position
   setSpeedAwayFromPosition(position: Vector): void {
     const speedTowardsPosition = CanvasObject.getPositionDifference(position, this.position);
     const newSpeed = new Vector();
-    // Calculate X First
-    if (speedTowardsPosition.x > 0 && speedTowardsPosition.y > 0) { // Position Is In Top Right Quadrant
-      newSpeed.x = Sketch.p5.random(-this.maxSpeed.x, this.maxSpeed.x);
-      if (newSpeed.x > 0) { // Y must be Negative
-        newSpeed.y = Sketch.p5.random(-this.minSpeed.y, -this.maxSpeed.y);
-      } else { // Y can be anything
-        newSpeed.y = Sketch.p5.random(-this.maxSpeed.y, this.maxSpeed.y);
-      }
-    } else if (speedTowardsPosition.x > 0 && speedTowardsPosition.y < 0) { // Position Is In Bottom Right Quadrant
-      newSpeed.x = Sketch.p5.random(-this.maxSpeed.x, this.maxSpeed.x);
-      if (newSpeed.x > 0) { // Y must be Positive
-        newSpeed.y = Sketch.p5.random(this.minSpeed.y, this.maxSpeed.y);
-      } else { // Y can be anything
-        newSpeed.y = Sketch.p5.random(-this.maxSpeed.y, this.maxSpeed.y);
-      }
-    } else if (speedTowardsPosition.x < 0 && speedTowardsPosition.y > 0) { // Position Is In Top Left Quadrant
-      newSpeed.x = Sketch.p5.random(-this.maxSpeed.x, this.maxSpeed.x);
-      if (newSpeed.x > 0) { // Y can be anything
-        newSpeed.y = Sketch.p5.random(-this.maxSpeed.y, this.maxSpeed.y);
-      } else { // Y must be Negative
-        newSpeed.y = Sketch.p5.random(-this.minSpeed.y, -this.maxSpeed.y);
-      }
-    } else if (speedTowardsPosition.x < 0 && speedTowardsPosition.y < 0) { // Position Is In Bottom Left Quadrant
-      newSpeed.x = Sketch.p5.random(-this.maxSpeed.x, this.maxSpeed.x);
-      if (newSpeed.x > 0) { // Y can be anything
-        newSpeed.y = Sketch.p5.random(-this.maxSpeed.y, this.maxSpeed.y);
-      } else { // Y must be Positive
-        newSpeed.y = Sketch.p5.random(this.minSpeed.y, this.maxSpeed.y);
-      }
+
+    if (speedTowardsPosition.x > 0 && speedTowardsPosition.y > 0) {// Move Away From Top Right Quadrant
+      // X & Y Must Be Negative
+      newSpeed.x = Sketch.p5.random(-this.minSpeed.x, -this.maxSpeed.x);
+      newSpeed.y = Sketch.p5.random(-this.minSpeed.y, -this.maxSpeed.y);
+    } else if (speedTowardsPosition.x < 0 && speedTowardsPosition.y > 0) {// Move Away From Top Left Quadrant
+      // X Must Be Positive & Y Must Be Negative
+      newSpeed.x = Sketch.p5.random(this.minSpeed.x, this.maxSpeed.x);
+      newSpeed.y = Sketch.p5.random(-this.minSpeed.y, -this.maxSpeed.y);
+    } else if (speedTowardsPosition.x > 0 && speedTowardsPosition.y < 0) {// Move Away From Bottom Right Quadrant
+      // X Must Be Negative & Y Must Be Positive
+      newSpeed.x = Sketch.p5.random(-this.minSpeed.x, -this.maxSpeed.x);
+      newSpeed.y = Sketch.p5.random(this.minSpeed.y, this.maxSpeed.y);
+    } else {// Move Away From Bottom Left Quadrant
+      // X & Y Must Be Positive
+      newSpeed.x = Sketch.p5.random(this.minSpeed.x, this.maxSpeed.x);
+      newSpeed.y = Sketch.p5.random(this.minSpeed.y, this.maxSpeed.y);
     }
     this.speed = newSpeed;
   }
