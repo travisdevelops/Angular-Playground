@@ -76,7 +76,6 @@ export class CanvasObject {
       y: Sketch.p5.random(-this.maxSpeed.y, this.maxSpeed.y)});
   }
 
-  // TODO: Speed Towards Should Not Exceed Position Difference in order to prevent overshooting (Test Revision)
   setSpeedTowardsPosition(position: Vector): void {
     const speedTowardsPosition = CanvasObject.getPositionDifference(position, this.position);
     const newSpeed = new Vector();
@@ -98,6 +97,12 @@ export class CanvasObject {
       newSpeed.y = Sketch.p5.random(this.minSpeed.y, maxSpeed.y);
     } else { // Y is Negative
       newSpeed.y = Sketch.p5.random(-this.minSpeed.y, -maxSpeed.y);
+    }
+    if (Math.abs(newSpeed.x) > Math.abs(speedTowardsPosition.x)) {
+      newSpeed.x = speedTowardsPosition.x;
+    }
+    if (Math.abs(newSpeed.y) > Math.abs(speedTowardsPosition.y)) {
+      newSpeed.y = speedTowardsPosition.y;
     }
     if (Math.abs(newSpeed.x) > Math.abs(speedTowardsPosition.x) || Math.abs(newSpeed.y) > Math.abs(speedTowardsPosition.y)) {
       console.log('Moving Faster Than Distance');

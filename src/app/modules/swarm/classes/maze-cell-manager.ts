@@ -35,7 +35,7 @@ export class MazeCellManager {
   // Create Strands
   createStrands(count: number, color: Vector): void {
     for (let i = 0; i < count; i++) {
-      const strand = new Strand({color: color});
+      const strand = new Strand({color: color, visionRadius: 50});
       strand.position = this.getRandomSpawnPoint();
       strand.randomizeMovements();
       this.strands.push(strand);
@@ -44,7 +44,7 @@ export class MazeCellManager {
 
   createAttackers(count: number, color: Vector): void {
     for (let i = 0; i < count; i++) {
-      const attackerStrand = new AttackerStrand({color: color});
+      const attackerStrand = new AttackerStrand({color: color, visionRadius: 50});
       attackerStrand.position = this.getRandomSpawnPoint();
       attackerStrand.randomizeMovements();
       this.attackerStrands.push(attackerStrand);
@@ -65,8 +65,8 @@ export class MazeCellManager {
   display(): void {
     this.mazeCells.forEach((mazeCell: MazeCell) => {
       this.displayMazeCell(mazeCell);
-      this.displayStrandsWithAIBehavior(mazeCell);
     });
+    this.displayStrandsWithAIBehavior(this.attackerStrands, this.strands);
   }
 
   displayMazeCell(mazeCell: MazeCell): void {
@@ -119,8 +119,9 @@ export class MazeCellManager {
     Sketch.p5.text('(' + mazeCell.col + ',' + mazeCell.row + ')', mazeCell.position.x + (this.gridSpacing / 2), mazeCell.position.y + (this.gridSpacing / 2));
   }
 
-  // TODO: Checking Strand Collisions Fail When They Are in Adjacent Maze Cells, Doesnt Work If Strands are not in a cell
-  displayStrandsWithAIBehavior(mazeCell: MazeCell) {
+/*
+// COLLISION DETECTION ALGORITHM
+getStrandsInMazeCell(mazeCell: MazeCell) {
     // Get All Attacker Strands In Cell
     const attackerStrandsInCell = this.attackerStrands.filter((attackerStrand: AttackerStrand) => {
       return this.positionIsInsideCell(mazeCell.position, attackerStrand.position);
@@ -129,31 +130,6 @@ export class MazeCellManager {
     const strandsInCell = this.strands.filter((strand: Strand) => {
       return this.positionIsInsideCell(mazeCell.position, strand.position);
     });
-
-    if (attackerStrandsInCell.length === 0 && strandsInCell.length > 0) { // Only Strands In Cell
-      this.moveStrandsInsideCell(strandsInCell);
-    } else if (strandsInCell.length === 0 && attackerStrandsInCell.length > 0) { // Only Attackers In Cell
-      this.moveStrandsInsideCell(attackerStrandsInCell);
-    } else {
-      // Make Attackers Move Towards The Closest Strand in Cell
-      attackerStrandsInCell.forEach((attackerStrand: AttackerStrand) => {
-        const closestStrand: Strand = this.getClosestStrandToAttacker(attackerStrand, strandsInCell);
-        if (closestStrand != null) {
-          this.moveAttackerStrandInsideCellTowardsStrand(attackerStrand, closestStrand);
-        } else {
-          this.moveStrandRandomly(attackerStrand);
-        }
-      });
-      // Make Strands Move Away From The Closest Strand in Cell
-      strandsInCell.forEach((strand: Strand) => {
-        const closestAttacker: AttackerStrand = this.getClosestAttackerToStrand(strand, attackerStrandsInCell);
-        if (closestAttacker != null) {
-          this.moveStrandInsideCellAwayFromAttackerStrand(strand, closestAttacker);
-        } else {
-          this.moveStrandRandomly(strand);
-        }
-      });
-    }
   }
 
   positionIsInsideCell(cellPosition: Vector, strandPosition: Vector): boolean {
@@ -162,10 +138,39 @@ export class MazeCellManager {
       strandPosition.x > cellPosition.x &&
       strandPosition.x < cellPosition.x + this.gridSpacing;
   }
+  */
+
+  displayStrandsWithAIBehavior(attackerStrands: Strand[], strands: Strand[]) {
+    if (attackerStrands.length === 0 && strands.length > 0) { // Only Strands In Cell
+      this.moveStrandsInsideCell(strands);
+    } else if (strands.length === 0 && attackerStrands.length > 0) { // Only Attackers In Cell
+      this.moveStrandsInsideCell(attackerStrands);
+    } else {
+      // Make Strands Move Away From The Closest Strand in Cell
+      strands.forEach((strand: Strand) => {
+        const closestAttacker: AttackerStrand = this.getClosestAttackerToStrand(strand, attackerStrands);
+        if (closestAttacker != null) {
+          this.moveStrandInsideCellAwayFromAttackerStrand(strand, closestAttacker);
+        } else {
+          this.moveStrandRandomly(strand);
+        }
+      });
+      // Make Attackers Move Towards The Closest Strand in Cell
+      attackerStrands.forEach((attackerStrand: AttackerStrand) => {
+        const closestStrand: Strand = this.getClosestStrandToAttacker(attackerStrand, strands);
+        if (closestStrand != null) {
+          this.moveAttackerStrandInsideCellTowardsStrand(attackerStrand, closestStrand);
+        } else {
+          this.moveStrandRandomly(attackerStrand);
+        }
+      });
+    }
+  }
+
 
   getClosestStrandToAttacker(attackerStrand: AttackerStrand, strands: Strand[]): Strand {
     let closestStrand: Strand = null;
-    let smallestDistance: Vector = null;
+    let smallestDistance: number = null;
     strands.forEach((strand: Strand) => {
       const distance = Sketch.p5.dist(attackerStrand.position.x, attackerStrand.position.y, strand.position.x, strand.position.y);
       if (distance <= attackerStrand.visionRadius && (distance < smallestDistance || smallestDistance == null)) {
@@ -173,8 +178,15 @@ export class MazeCellManager {
         closestStrand = strand;
       }
     });
+    if (smallestDistance < 20) {
+      closestStrand = null;
+    }
+    if (smallestDistance < 10) {
+      // TODO: Add Function to Eat Strand And Get Bigger And Faster
+    }
     if (this.debug && closestStrand != null) {
-      Sketch.p5.stroke(235, 120, 112);
+      Sketch.p5.strokeWeight(2);
+      Sketch.p5.stroke(226, 112, 58);
       Sketch.p5.line(attackerStrand.position.x, attackerStrand.position.y, closestStrand.position.x, closestStrand.position.y);
     }
     return closestStrand;
@@ -190,6 +202,11 @@ export class MazeCellManager {
         closestAttacker = attackerStrand;
       }
     });
+    if (this.debug && closestAttacker != null) {
+      Sketch.p5.strokeWeight(2);
+      Sketch.p5.stroke(188, 254, 0);
+      Sketch.p5.line(strand.position.x, strand.position.y, closestAttacker.position.x, closestAttacker.position.y);
+    }
     return closestAttacker;
   }
 

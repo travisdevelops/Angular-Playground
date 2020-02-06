@@ -39,7 +39,7 @@ export class Strand extends CanvasObject {
   display() {
     this.displayBody();
     this.displayTail();
-    this.displayVision();
+    // this.displayVision();
   }
 
   private displayBody() {

@@ -49,6 +49,7 @@ export class SwarmComponent implements OnInit, OnDestroy {
         this.mazeCellManager = new MazeCellManager({position: new Vector({x: 100, y: 10}), color: new Vector({x: 159, y: 32, z: 66}),
           debug: true });
         this.mazeCellManager.addMazeCell({col: 0, row: 1, top: true, bottom: true, left: true });
+        this.mazeCellManager.addMazeCell({col: 1, row: 1});
         this.mazeCellManager.addMazeCell({col: 1, row: 0, top: true, left: true });
         this.mazeCellManager.addMazeCell({col: 1, row: 2, left: true});
         this.mazeCellManager.addMazeCell({col: 1, row: 3, left: true, right: true});
@@ -56,32 +57,29 @@ export class SwarmComponent implements OnInit, OnDestroy {
         this.mazeCellManager.addMazeCell({col: 2, row: 0, top: true, right: true});
         this.mazeCellManager.addMazeCell({col: 2, row: 1, left: true, right: true});
         this.mazeCellManager.addMazeCell({col: 2, row: 2, left: true, right: true});
+        this.mazeCellManager.addMazeCell({col: 2, row: 3});
         this.mazeCellManager.addMazeCell({col: 2, row: 4, bottom: true, top: true});
-        this.mazeCellManager.addMazeCell({col: 3, row: 2, bottom: true, right: true});
+        this.mazeCellManager.addMazeCell({col: 3, row: 3, top: true});
         this.mazeCellManager.addMazeCell({col: 3, row: 4, top: true, bottom: true});
         this.mazeCellManager.addMazeCell({col: 4, row: 0, top: true, left: true});
         this.mazeCellManager.addMazeCell({col: 4, row: 1, left: true, right: true});
+        this.mazeCellManager.addMazeCell({col: 4, row: 2, left: true});
         this.mazeCellManager.addMazeCell({col: 4, row: 3, bottom: true, right: true});
         this.mazeCellManager.addMazeCell({col: 4, row: 4, bottom: true});
         this.mazeCellManager.addMazeCell({col: 5, row: 0, top: true, right: true});
         this.mazeCellManager.addMazeCell({col: 5, row: 1, right: true});
         this.mazeCellManager.addMazeCell({col: 5, row: 2, left: true, right: true});
+        this.mazeCellManager.addMazeCell({col: 5, row: 3});
         this.mazeCellManager.addMazeCell({col: 5, row: 4, bottom: true, right: true});
         this.mazeCellManager.addMazeCell({col: 6, row: 3, bottom: true, top: true, right: true});
 
-      // Fake Cells
-        this.mazeCellManager.addMazeCell({col: 1, row: 1});
-        this.mazeCellManager.addMazeCell({col: 2, row: 3});
-        this.mazeCellManager.addMazeCell({col: 3, row: 3});
-        this.mazeCellManager.addMazeCell({col: 5, row: 3});
-
         // Strand Entrances
-        // this.mazeCellManager.addSpawnPoint({col: 0, row: 1});
+        this.mazeCellManager.addSpawnPoint({col: 0, row: 1});
         this.mazeCellManager.addSpawnPoint({col: 6, row: 3});
-        // this.mazeCellManager.addSpawnPoint({col: 3, row: 3});
+        this.mazeCellManager.addSpawnPoint({col: 3, row: 3});
 
-        this.mazeCellManager.createStrands(1, new Vector({x: 188, y: 254, z: 0}));
-        this.mazeCellManager.createAttackers(1, new Vector({x: 226, y: 112, z: 58}));
+        this.mazeCellManager.createStrands(50, new Vector({x: 188, y: 254, z: 0}));
+        this.mazeCellManager.createAttackers(10, new Vector({x: 226, y: 112, z: 58}));
       };
 
       // Draw P5 js
