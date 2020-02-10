@@ -6,11 +6,11 @@ import {AttackerStrand} from '@app/modules/swarm/classes/attacker-strand';
 
 export class MazeCellManager {
   private mazeCells: MazeCell[] = [];
-  private gridSpacing: number;
-  private mazeBorderWidth: number;
+  private readonly gridSpacing: number;
+  private readonly mazeBorderWidth: number;
   private color: Vector;
-  private position: Vector;
-  private debug: boolean;
+  private readonly position: Vector;
+  private readonly debug: boolean;
   private strands: Strand[] = [];
   private attackerStrands: AttackerStrand[] = [];
   private spawnPoints: Cell[] = [];
@@ -35,7 +35,7 @@ export class MazeCellManager {
   // Create Strands
   createStrands(count: number, color: Vector): void {
     for (let i = 0; i < count; i++) {
-      const strand = new Strand({color: color, visionRadius: 50});
+      const strand = new Strand({color: color});
       strand.position = this.getRandomSpawnPoint();
       strand.randomizeMovements();
       this.strands.push(strand);
@@ -44,7 +44,7 @@ export class MazeCellManager {
 
   createAttackers(count: number, color: Vector): void {
     for (let i = 0; i < count; i++) {
-      const attackerStrand = new AttackerStrand({color: color, visionRadius: 50});
+      const attackerStrand = new AttackerStrand({color: color});
       attackerStrand.position = this.getRandomSpawnPoint();
       attackerStrand.randomizeMovements();
       this.attackerStrands.push(attackerStrand);
@@ -140,7 +140,7 @@ getStrandsInMazeCell(mazeCell: MazeCell) {
   }
   */
 
-  displayStrandsWithAIBehavior(attackerStrands: Strand[], strands: Strand[]) {
+  displayStrandsWithAIBehavior(attackerStrands: AttackerStrand[], strands: Strand[]) {
     if (attackerStrands.length === 0 && strands.length > 0) { // Only Strands In Cell
       this.moveStrandsInsideCell(strands);
     } else if (strands.length === 0 && attackerStrands.length > 0) { // Only Attackers In Cell
@@ -167,6 +167,14 @@ getStrandsInMazeCell(mazeCell: MazeCell) {
     }
   }
 
+  // Add Function to Eat Strand And Get Bigger And Faster
+  attackerEatStrand(attackerStrand: AttackerStrand, strand: Strand): void {
+    attackerStrand.eatStrand(strand);
+    this.strands = this.strands.filter((s: Strand) => {
+      return s !== strand;
+    });
+  }
+
 
   getClosestStrandToAttacker(attackerStrand: AttackerStrand, strands: Strand[]): Strand {
     let closestStrand: Strand = null;
@@ -178,16 +186,16 @@ getStrandsInMazeCell(mazeCell: MazeCell) {
         closestStrand = strand;
       }
     });
-    if (smallestDistance < 20) {
-      closestStrand = null;
-    }
-    if (smallestDistance < 10) {
-      // TODO: Add Function to Eat Strand And Get Bigger And Faster
-    }
-    if (this.debug && closestStrand != null) {
-      Sketch.p5.strokeWeight(2);
-      Sketch.p5.stroke(226, 112, 58);
-      Sketch.p5.line(attackerStrand.position.x, attackerStrand.position.y, closestStrand.position.x, closestStrand.position.y);
+
+    if (closestStrand != null) {
+      if (smallestDistance < 10) {
+        this.attackerEatStrand(attackerStrand, closestStrand);
+      }
+      if (this.debug) {
+        Sketch.p5.strokeWeight(2);
+        Sketch.p5.stroke(226, 112, 58);
+        Sketch.p5.line(attackerStrand.position.x, attackerStrand.position.y, closestStrand.position.x, closestStrand.position.y);
+      }
     }
     return closestStrand;
   }

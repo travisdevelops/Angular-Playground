@@ -1,6 +1,5 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import { Vector } from '@classes/vector';
-import { Theme } from '@classes/theme';
 import { Sketch } from '@classes/sketch';
 import p5 from 'p5';
 import {StrandContainerManager} from '@app/modules/swarm/classes/strand-container-manager';

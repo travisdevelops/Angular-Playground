@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Calendar } from '../../classes/calendar';
-import { CalendarEvent } from '../../interfaces/calendar-event';
 import { Vector } from '@classes/vector';
-
 
 @Component({
   selector: 'app-calendar',

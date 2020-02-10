@@ -6,7 +6,7 @@ Angular 8 App Designed To Demonstrate The Capabilities of the P5.js library and 
 
 
 ## Installation
-Anuglar Playground requires [Angular 8.3.23](https://angular.io/) to run.
+Angular Playground requires [Angular 8.3.23](https://angular.io/) to run.
 
 Install the dependencies and start the angular server.
 

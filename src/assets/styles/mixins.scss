@@ -1,3 +1,5 @@
+@import 'variables.scss';
+
 /* Duplicate Styling For Each Theme */
 @mixin themes(){
   @each $theme, $map in $themes {

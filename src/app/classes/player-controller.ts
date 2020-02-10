@@ -1,41 +1,52 @@
 import {Vector} from '@classes/vector';
-import {Strand} from '@app/modules/swarm/classes/strand';
 import {Sketch} from '@classes/sketch';
+import {CanvasObject} from '@classes/canvas-object';
 
-export class MazePlayer extends Strand {
+export class PlayerController extends CanvasObject {
     private acceleration: number;
     private gravity: number;
     private buttonTime: Vector;
 
-  constructor({ position = new Vector(), size = new Vector(), maxSpeed = new Vector() } = {}) {
+  constructor({position = new Vector(), size = new Vector(), maxSpeed = new Vector(), acceleration = 10, gravity = 0.2} = {}) {
     super();
     this.size = size;
     this.maxSpeed = maxSpeed;
     this.position = position;
-    this.gravity = 0.2;
-    this.acceleration = 10;
+    this.gravity = gravity;
+    this.acceleration = acceleration;
     this.buttonTime = new Vector();
   }
 
   move() {
+    this.moveHorizontal();
+    // this.moveVertical();
+    super.move();
+  }
+
+  moveHorizontal(): void {
     const buttonDirection = new Vector();
     const horizontalButtonPressed = Sketch.p5.keyIsDown(Sketch.p5.LEFT_ARROW) || Sketch.p5.keyIsDown(Sketch.p5.RIGHT_ARROW);
-    const verticalButtonPressed = Sketch.p5.keyIsDown(Sketch.p5.UP_ARROW) || Sketch.p5.keyIsDown(Sketch.p5.DOWN_ARROW);
 
     if (horizontalButtonPressed) {
       buttonDirection.x = Sketch.p5.keyIsDown(Sketch.p5.LEFT_ARROW) ? -1 : 1;
     }
+    // Calculate Time
+    this.buttonTime.x = this.calculateButtonTime(horizontalButtonPressed, this.buttonTime.x, buttonDirection.x, this.speed.x);
+    // Calculate Speed
+    this.speed.x = this.calculateSpeed(this.speed.x, buttonDirection.x, this.buttonTime.x, this.maxSpeed.x);
+  }
+
+  moveVertical(): void {
+    const buttonDirection = new Vector();
+    const verticalButtonPressed = Sketch.p5.keyIsDown(Sketch.p5.UP_ARROW) || Sketch.p5.keyIsDown(Sketch.p5.DOWN_ARROW);
+
     if (verticalButtonPressed) {
       buttonDirection.y = Sketch.p5.keyIsDown(Sketch.p5.UP_ARROW) ? -1 : 1;
     }
     // Calculate Time
-    this.buttonTime.x = this.calculateButtonTime(horizontalButtonPressed, this.buttonTime.x, buttonDirection.x, this.speed.x);
     this.buttonTime.y = this.calculateButtonTime(verticalButtonPressed, this.buttonTime.y, buttonDirection.y, this.speed.y);
-
     // Calculate Speed
-    this.speed.x = this.calculateSpeed(this.speed.x, buttonDirection.x, this.buttonTime.x, this.maxSpeed.x);
     this.speed.y = this.calculateSpeed(this.speed.y, buttonDirection.y, this.buttonTime.y, this.maxSpeed.y);
-    super.move();
   }
 
   calculateButtonTime(buttonPressed, time, buttonDirection, speed) {

@@ -4,14 +4,14 @@ import {Sketch} from '@classes/sketch';
 
 export class Strand extends CanvasObject {
   private lastPositions: Vector[];
-  private glowEffectSizeMultipler = 3;
+  private glowEffectSizeMultiplier = 3;
   public tailLength = 15;
   public tailHasTaperedAlpha = true;
   public tailHasTaperedSize = true;
   private randomMovementTimeout;
   public visionRadius: number;
 
-  constructor({color = new Vector(), minSpeed = new Vector({x: 0.5, y: 0.5}), maxSpeed = new Vector({x: 2, y: 2}), size = new Vector({x: 4, y: 4}), position = new Vector({x: 0, y: 0}), visionRadius = 50} = {}) {
+  constructor({color = new Vector(), minSpeed = new Vector({x: 0.5, y: 0.5}), maxSpeed = new Vector({x: 2, y: 2}), size = new Vector({x: 4, y: 4}), position = new Vector({x: 0, y: 0}), visionRadius = 15} = {}) {
     super();
     this.color = color;
     this.maxSpeed = maxSpeed;
@@ -23,36 +23,40 @@ export class Strand extends CanvasObject {
   }
 
   // Randomize Movements On A Random Interval That Continues To Change
-  randomizeMovements() {
+  randomizeMovements(): void {
     this.stopRandomMovements();
     this.randomizeSpeed();
     this.randomMovementTimeout = setTimeout(() => {this.randomizeMovements(); }, Math.floor(Sketch.p5.random(200, 800)));
   }
 
-  stopRandomMovements() {
+  stopRandomMovements(): void {
     if (this.randomMovementTimeout != null) {
       clearTimeout(this.randomMovementTimeout);
     }
   }
 
   // Display Strand With Glow
-  display() {
+  display(): void {
     this.displayBody();
+    // this.displayGlowEffect();
     this.displayTail();
-    // this.displayVision();
+    this.displayVision();
   }
 
-  private displayBody() {
+  private displayBody(): void {
     Sketch.p5.noStroke();
     Sketch.p5.fill(this.color.x, this.color.y, this.color.z);
     Sketch.p5.ellipse(this.position.x, this.position.y, this.size.x);
-    // Glow Effect
+  }
+
+  // Glow Effect
+  private displayGlowEffect(): void {
     Sketch.p5.fill(this.color.x, this.color.y, this.color.z, 80);
-    Sketch.p5.ellipse(this.position.x, this.position.y, this.size.x * this.glowEffectSizeMultipler);
+    Sketch.p5.ellipse(this.position.x, this.position.y, this.size.x * this.glowEffectSizeMultiplier);
   }
 
   // Display Tails
-  private displayTail() {
+  private displayTail(): void {
     Sketch.p5.noFill();
     const tailSizeTaperRate = this.size.x / this.lastPositions.length;
     const tailAlphaTaperRate = 255 / this.lastPositions.length;
@@ -74,7 +78,7 @@ export class Strand extends CanvasObject {
   }
 
 
-  private displayVision() {
+  private displayVision(): void {
     Sketch.p5.noStroke();
     // Glow Effect
     Sketch.p5.fill(this.color.x, this.color.y, this.color.z, 40);
@@ -82,7 +86,7 @@ export class Strand extends CanvasObject {
   }
 
   // Add Tail After Moving - Overrides the Parent Method
-  move() {
+  move(): void {
     super.move();
     this.saveLastPosition();
   }
@@ -90,7 +94,7 @@ export class Strand extends CanvasObject {
 
   // Save Last Position As First In Array
   // Always Keeps At Least 1 Vector Of Position in Array
-  private saveLastPosition() {
+  private saveLastPosition(): void {
     const lastPositionIsSameAsCurrent = this.lastPositions.length > 0 && this.lastPositions[0].x === this.position.x
       && this.lastPositions[0].y === this.position.y;
 
