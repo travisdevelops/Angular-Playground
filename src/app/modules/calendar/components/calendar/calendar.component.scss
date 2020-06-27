@@ -3,9 +3,6 @@
 :host{
   display: block;
   padding: 20px 10px;
-  height: calc(100% - 70px);
-  overflow-y: auto;
-  overflow-x: hidden;
 }
 
 .calender-nav-button{
@@ -14,6 +11,8 @@
     border: 1px solid;
     cursor:pointer;
     transition: background-color 0.3s;
+    white-space: nowrap;
+    
     @include themes() {
         color: theme(buttonTextColor);  
         border-color: theme(buttonTextColor); 
@@ -42,6 +41,7 @@
       font-weight: bold;
       font-size: 30px;
       line-height: 20px;
+      white-space: nowrap;
       @include themes() {
         color: theme(textColor) !important;   
       }
@@ -60,8 +60,13 @@
       height:140px;
       min-width:115px;
 
-      &.current-day{
-        background: #5ec4ea !important;
+      &.current-day:not(.selected-day){
+        background: #FFC107 !important;
+        font-weight: bold;
+      }
+
+      &.selected-day{
+        background: #a2a2a2 !important;
         font-weight: bold;
       }
 
@@ -90,4 +95,10 @@
     }
     
 
+    }
+
+
+    #lottoSearchResults {
+      max-height: 700px;
+      overflow: auto;
     }

@@ -5,7 +5,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { PlaygroundPickerComponent } from './components/playground-picker/playground-picker.component';
 import { FontAwesomeModule, FaIconLibrary } from '@fortawesome/angular-fontawesome';
-import {faSun, faMoon} from '@fortawesome/free-solid-svg-icons';
+import {faSun, faMoon, faChevronCircleLeft} from '@fortawesome/free-solid-svg-icons';
 import * as $ from 'jquery';
 import * as bootstrap from 'bootstrap';
 import { ModalComponent } from './components/modal/modal.component';
@@ -34,6 +34,6 @@ import { HomeComponent } from './components/home/home.component';
 export class AppModule {
   constructor(library: FaIconLibrary) {
     // Add an icon to the library for convenient access in other components
-    library.addIcons(faSun, faMoon);
+    library.addIcons(faSun, faMoon, faChevronCircleLeft);
   }
 }
