@@ -3,7 +3,7 @@ import { Calendar } from '../../classes/calendar';
 import { CalendarEvent } from '../../interfaces/calendar-event';
 import { FormControl, FormBuilder } from '@angular/forms';
 import { Subject } from 'rxjs';
-import { takeUntil, tap, filter } from 'rxjs/operators';
+import { takeUntil, tap, filter, distinctUntilChanged, debounceTime } from 'rxjs/operators';
 
 
 @Component({
@@ -50,14 +50,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
     this.month = new FormControl({ value: this.calendar.month, disabled: true});
   }
 
-  setYear() {
-    this.calendar.year = this.year.value;
-    this.year.setValue(this.calendar.year);
-    this.year.disable();
-  }
-
   editYear() {
-    this.year.enable();
+    this.year.enable({emitEvent: false});
   }
 
   editMonth() {
@@ -66,10 +60,32 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
   handleFormChanges() {
     this.month.valueChanges.pipe(
+      distinctUntilChanged(),
       filter(() => this.month.enabled),
       tap((month) => {
         this.calendar.month = month;
+        this.month.setValue(this.calendar.month);
+      }),
+      takeUntil(this._destroyed$)
+    ).subscribe();
+
+    this.year.valueChanges.pipe(
+      distinctUntilChanged(),
+      debounceTime(500),
+      filter(() => this.year.enabled),
+      tap((year) => {
+        this.calendar.year = year;
+        this.year.setValue(this.calendar.year);
+      }),
+      takeUntil(this._destroyed$)
+    ).subscribe();
+
+    this.calendar.dateChanged$.pipe(
+      tap((date: Date) => {
         this.month.disable();
+        this.year.disable();
+        this.month.setValue(date.getMonth());
+        this.year.setValue(date.getFullYear());
       }),
       takeUntil(this._destroyed$)
     ).subscribe();

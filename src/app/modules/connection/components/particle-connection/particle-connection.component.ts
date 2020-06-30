@@ -17,8 +17,8 @@ export class ParticleConnectionComponent implements OnInit, OnDestroy {
 
   constructor() {
     this.particles = [];
-    this.particleCount = 200;
-    this.particleConnectionLength = 100;
+    this.particleCount = 100;
+    this.particleConnectionLength = 50;
   }
 
   ngOnInit() {

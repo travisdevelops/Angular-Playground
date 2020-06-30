@@ -1,9 +1,6 @@
-<ng-container *ngIf="calendar">
-  <div class="row p-2 mb-3">
+<div *ngIf="calendar" class="pb-2 px-2">
+  <div class="row calendar-header pt-2">
     <div class="col">
-      <span class="calender-nav-button previous" (click)="calendar.prevMonth()" *ngIf="calendar.canMovePrev">&larr; Prev</span>
-    </div>
-    <div class="col text-center">
       <span class="calendar-title">
         <ng-container *ngIf="!month || month && month.disabled">
           <span (click)="editMonth()">{{calendar.monthString}} </span>
@@ -17,33 +14,35 @@
           <span (click)="editYear()">{{calendar.year}}</span>
         </ng-container>
         <ng-container *ngIf="year && year.enabled">
-          <input [formControl]="year" (blur)="setYear()" class="ml-2 w-100"/>
+          <input [formControl]="year" class="ml-2 w-100"/>
         </ng-container>
       </span>
-    </div>
+    </div> 
     <div class="col text-right">
-      <span class="calender-nav-button next" (click)="calendar.nextMonth()" *ngIf="calendar.canMoveNext">Next &rarr;</span>
-      </div>
-      <div class="col">
-        <span class="calender-nav-button ml-3" (click)="calendar.today()">Today</span>
-      </div>
+      <span class="calendar-nav-button previous" (click)="calendar.prevMonth()" *ngIf="calendar.canMovePrev">&larr;</span>
+      <span class="calendar-nav-button ml-4 mr-4" (click)="calendar.today()">Today</span>
+      <span class="calendar-nav-button next" (click)="calendar.nextMonth()" *ngIf="calendar.canMoveNext">&rarr;</span>
+    </div>
   </div>
       
-  <table class="table table-bordered calendar-table">
+  <table class="table calendar-table">
     <thead>
       <tr>
-        <td *ngFor="let day of Calendar.daysOfWeek">{{day}}</td>
+        <th *ngFor="let day of Calendar.daysOfWeek">{{day}}</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let week of calendar.weeks">
-        <td *ngFor="let day of week" [ngClass]="{'selected-month' : day.isSelectedMonth, 'current-day' : day.isToday, 'selected-day': day.date === calendar.selectedDay}">{{day.day}}
-        <ng-container *ngFor="let event of day.events; index as i;">
-          <span class='text-center' [style.background-color]="'rgb('+event.color.x+','+event.color.y+','+event.color.z+')'" *ngIf="day.events.length <= 4 || (day.events.length > 4 && i < 3)">{{event.title}}</span>
-        </ng-container>
-          <span *ngIf="day.events.length > 4" class="additional-events">View +{{day.events.length - 3}} More Events</span>
+        <td *ngFor="let day of week">
+          <div [ngClass]="{'selected-month' : day.month === calendar.month, 'selected-day': day.date === calendar.selectedDay}">
+            <span class="day">{{day.day}}</span>
+          <ng-container *ngFor="let event of day.events; index as i;">
+            <span class='text-center event' [style.background-color]="'rgb('+event.color.x+','+event.color.y+','+event.color.z+')'" *ngIf="day.events.length <= 4 || (day.events.length > 4 && i < 3)">{{event.title}}</span>
+          </ng-container>
+            <span *ngIf="day.events.length > 4" class="additional-events">View {{day.events.length - 4}} Other Events</span>
+          </div>
         </td>
       </tr>
     </tbody>
   </table>  
-</ng-container>
+</div>

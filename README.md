@@ -16,10 +16,6 @@ $ npm install
 $ npm run start
 ```
 
-## Todos
-  - **(Maze Module)** Implement Max Speed - Pressing Directional Arrows Should Increase/Decrease Speed Gradually To Prevent Sharp Turns
-  - **(Maze Module)** Light Up Area Around MazeStrand Should Be Sized Proportionate to Speed
-
 ## License
 MIT
 

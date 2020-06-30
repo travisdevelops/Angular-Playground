@@ -1,0 +1,24 @@
+@import '../../../../../../src/styles';
+
+:host {
+    overflow-y: auto;
+    display: block;
+    height: calc(100% - 50px);
+}
+
+.search-results-wrapper {
+    max-height: 400px;
+    overflow: auto;
+    
+    .search-results-title {
+        position: sticky;
+        top: 0;
+        @include themes() {
+            background-color: theme(backgroundColor);
+          }
+    }
+
+    .search-results {
+
+    }
+}

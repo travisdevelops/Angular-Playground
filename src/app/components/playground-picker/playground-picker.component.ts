@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Theme } from '@classes/theme';
 
 @Component({
   selector: 'app-playground-picker',
@@ -6,8 +7,11 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./playground-picker.component.scss']
 })
 export class PlaygroundPickerComponent implements OnInit {
+  Theme: any;
 
-  constructor() { }
+  constructor() {
+    this.Theme = Theme;
+  }
 
   ngOnInit() {
   }

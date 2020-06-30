@@ -1,11 +1,16 @@
 import {CalendarEvent} from '../interfaces/calendar-event';
 import {Day} from '../interfaces/day';
+import { Subject } from 'rxjs';
 
 export class Calendar {
-  public static daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  public static monthNames = ['January', 'February', 'March',
-    'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  public static daysOfWeek = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+  public static daysOfWeekLong = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  public static monthNames = ['Jan', 'Feb', 'Mar',
+    'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    public static monthNamesLong = ['January', 'February', 'March',
+      'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
   selectedDay: string;
+  dateChanged$: Subject<Date> = new Subject();
 
   private _date: Date;
   private _weeks: any[] = [];
@@ -18,7 +23,7 @@ export class Calendar {
     this.events = events;
     this.min = min;
     this.max = max;
-    this.setValidDate(date);
+    this.setValidDate(date, true);
   }
 
   // Get First Day of Selected Month - Day of Week 0-6
@@ -131,16 +136,18 @@ export class Calendar {
   // Previous Month
   prevMonth(): void {
     if (this.canMovePrev) {
-      this._date.setMonth(this._date.getMonth() - 1);
-      this.refreshCalendar();
+      const date = new Date(this._date);
+      date.setMonth(date.getMonth() - 1);
+      this.setValidDate(date);
     }
   }
 
   // Next Month
   nextMonth(): void {
     if (this.canMoveNext) {
-      this._date.setMonth(this._date.getMonth() + 1);
-      this.refreshCalendar();
+      const date = new Date(this._date);
+      date.setMonth(date.getMonth() + 1);
+      this.setValidDate(date);
     }
   }
 
@@ -148,7 +155,7 @@ export class Calendar {
     let today = new Date();
     today = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0, 0);
     if (!this.isToday) {
-      this.setValidDate(today);
+      this.setValidDate(today, true);
     }
   }
 
@@ -214,6 +221,8 @@ export class Calendar {
     const currDate = new Date(this._date);
     if (selectDate) {
       this.selectedDay = Calendar.dateToString(dateToCheck);
+    } else {
+      this.selectedDay = '';
     }
     if (dateToCheck >= this.min && dateToCheck <= this.max) {
       this._date = new Date(dateToCheck);
@@ -222,8 +231,10 @@ export class Calendar {
     } else if (dateToCheck > this.max) {
       this._date = new Date(this.max);
     }
-    if (currDate.getMonth() !== this.month || currDate.getFullYear() !== this.year) {
+    const dateChanged = currDate.getMonth() !== this.month || currDate.getFullYear() !== this.year;
+    if (dateChanged) {
       this.refreshCalendar();
+      this.dateChanged$.next(this._date);
     }
   }
 
@@ -312,12 +323,11 @@ export class Calendar {
   }
 
   getDayEvents(day: number, month: number, year: number): Day {
-    const today = new Date();
     return {
       day,
+      month,
+      year,
       date: Calendar.fullDateToString(day, month, year),
-      isSelectedMonth: this._date.getMonth() === month,
-      isToday: today.getDate() === day && today.getMonth() === month && today.getFullYear() === year,
       events: this.getSortedEvents(year, month, day)
     };
   }

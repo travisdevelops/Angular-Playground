@@ -1,0 +1,70 @@
+<div class="row">
+    <div class="col">
+      <div class="p-2">
+        <span class="badge mr-2" style="background-color: rgb(33, 150, 243);">Midday</span>
+        <span class="badge" style="background-color: rgb(76, 175, 80);">Evening</span>
+      </div>
+        <app-calendar [events]="lottoEvents"></app-calendar>
+    </div>
+    <div class="col-4" *ngIf="lottoSearchGroup != null">
+      <div class="pr-3">
+      <div class="mt-4 mb-3">
+        <span class="btn btn-primary clickable mr-3" (click)="getLatest()">Get Latest</span>
+        <span class="btn btn-danger clickable" (click)="getStatistics()">Get Statistics</span>
+      </div>
+      <ng-container *ngIf="!showAdd">
+      <form [formGroup]="lottoSearchGroup">
+        <div class="form-group">
+          <label class="theme-text">Number</label>
+          <input class="form-control" formControlName="number" />
+        </div>
+              <div class="btn-group w-100" role="group">
+                <button type="button" class="btn" [ngClass]="{'theme-button-outline' : lottoSearch.playType.value !== 1, 'theme-button' : lottoSearch.playType.value === 1}" (click)="searchBox()">Box</button>
+                <button type="button" class="btn" [ngClass]="{'theme-button-outline' : lottoSearch.playType.value !== 2, 'theme-button' : lottoSearch.playType.value === 2}" (click)="searchStraight()">Straight</button>
+              </div>
+            </form>
+            <ng-container *ngIf="!lottoSearch.playType.value">
+              <h3 class="mt-4 theme-text">Top Numbers</h3>
+              <div class="row">
+                <div class="col-6">
+                  <h6 class="theme-text">Numbers (Midday)</h6>
+                  <ul>
+                    <li *ngFor="let result of statisticsLottoJSON.numbersMidday | slice:0:5" class="theme-text">
+                      <span class="theme-text">{{result.number + ' - Count ' + result.count}}</span>
+                    </li>
+                  </ul>
+                  <h6 class="theme-text">Numbers (Evening)</h6>
+                  <ul>
+                    <li *ngFor="let result of statisticsLottoJSON.numbersEvening | slice:0:5" class="theme-text">
+                      <span class="theme-text">{{result.number + ' - Count ' + result.count}}</span>
+                    </li>
+                  </ul>
+                </div>
+                <div class="col-6">
+                  <h6 class="theme-text">Win4 (Midday)</h6>
+                  <ul>
+                    <li *ngFor="let result of statisticsLottoJSON.win4Midday | slice:0:5" class="theme-text">
+                      <span class="theme-text">{{result.number + ' - Count ' + result.count}}</span>
+                    </li>
+                  </ul>
+                  <h6 class="theme-text">Win4 (Evening)</h6>
+                  <ul>
+                    <li *ngFor="let result of statisticsLottoJSON.win4Evening | slice:0:5" class="theme-text">
+                      <span class="theme-text">{{result.number + ' - Count ' + result.count}}</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </ng-container>
+            <div class="border rounded mt-3 px-3 pb-3 search-results-wrapper" *ngIf="lottoSearch.playType.value">
+              <h3 class="mb-0 py-2 theme-text search-results-title">Results</h3>
+            <ul class="mb-0 search-results">
+              <li *ngFor="let event of lottoSearchResults" class="theme-text">
+                <span class="theme-text clickable" (click)="setCalendar(event)">{{event.startDate | date}} - {{event.title}}</span>
+              </li>
+            </ul>
+            </div>
+      </ng-container>
+      </div>
+    </div>
+  </div>

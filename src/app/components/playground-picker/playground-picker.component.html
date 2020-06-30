@@ -1,20 +1,34 @@
 <div class="modal-dialog modal-lg">
   <div class="modal-content">
     <div class="modal-header">
-      <h5 class="modal-title">Playground Picker</h5>
-      <button type="button" class="close" aria-label="Close" data-dismiss="modal">
+      <h5 class="modal-title theme-text">Playground Picker</h5>
+      <button type="button" class="close theme-text" aria-label="Close" data-dismiss="modal">
         <span aria-hidden="true">&times;</span>
       </button>
     </div>
-    <div class="modal-body text-center">
-      <h3>Choose Angular App</h3>
-      <div class="mt-4 mb-3">
-        <button class="btn btn-dark" routerLink="/" data-dismiss="modal">Home</button> |
-        <button class="btn btn-dark" routerLink="/connection" data-dismiss="modal">Particle Connections</button> |
-        <button class="btn btn-dark" routerLink="/calendar" data-dismiss="modal">Calendar</button> |
-        <button class="btn btn-dark" routerLink="/emitter" data-dismiss="modal">Particle Emitter</button> |
-        <button class="btn btn-dark" routerLink="/swarm" data-dismiss="modal">Swarm</button> |
-        <button class="btn btn-dark" routerLink="/swarm/maze" data-dismiss="modal">Maze</button>
+    <div class="modal-body text-center px-0">
+      <h3 class="theme-text">Choose Angular App</h3>
+      <div class="my-3">
+        <div>
+          <button class="btn theme-button mr-2" routerLink="/" data-dismiss="modal">Home</button>
+          <button class="btn theme-button mr-2" routerLink="/connection" data-dismiss="modal">Particle Connections</button>
+          <button class="btn theme-button" routerLink="/calendar" data-dismiss="modal">Calendar</button>
+        </div>
+        <div class="mt-2">
+        <button class="btn theme-button mr-2" routerLink="/calendar/lotto" data-dismiss="modal">Lotto Calendar</button>
+        <button class="btn theme-button mr-2" routerLink="/emitter" data-dismiss="modal">Particle Emitter</button>
+        <button class="btn theme-button" routerLink="/swarm" data-dismiss="modal">Swarm</button>
+        </div>
+      </div>
+      <div class="text-center">
+        <span>
+          <label class="toggle" for="toggler">
+            <input type="checkbox" id="toggler" (change)="Theme.toggle()" [(ngModel)]="Theme.darkThemeToggled">
+            <fa-icon icon="sun" class="toggle-icon toggle-icon-left"></fa-icon>
+            <span></span>
+            <fa-icon icon="moon" class="toggle-icon toggle-icon-right theme-text"></fa-icon>
+          </label>
+        </span>
       </div>
     </div>
   </div>

@@ -1,104 +1,138 @@
-@import '../../../../../../src/styles';
+@import "../../../../../../src/styles";
 
-:host{
-  display: block;
-  padding: 20px 10px;
+@media only screen and (min-width: 500px) {
+  .calendar-nav-button {
+    font-size: 13px !important;
+    line-height: 33px !important;
+  }
+  tbody td {
+    div {
+      height: 130px !important;
+
+      span {
+        font-size: 13px !important;
+        padding: 2px 0px !important;
+    
+        &:not(.day) {
+          margin: 3px 0px 0px 0px !important;
+        }
+      }
+    }
+  }
 }
 
-.calender-nav-button{
+.calendar-header, th {
+  position: sticky;
+  top:0;
+  @include themes() {
+    background-color: theme(backgroundColor);
+  }
+}
+
+th {
+  top: 40px;
+}
+
+.calendar-header {
+  .calendar-nav-button {
     padding: 5px 10px;
     border-radius: 20px;
     border: 1px solid;
-    cursor:pointer;
+    cursor: pointer;
     transition: background-color 0.3s;
     white-space: nowrap;
-    
+    font-size: 10px;
+    line-height: 10px;
+  
     @include themes() {
-        color: theme(buttonTextColor);  
-        border-color: theme(buttonTextColor); 
-        background-color: theme(buttonBGColor);
+      color: theme(buttonTextColor);
+      border-color: theme(buttonTextColor);
+      background-color: theme(buttonBGColor);
     }
-    
-    &:hover{
+  
+    &:hover {
       @include themes() {
-          color: theme(buttonTextHoverColor);  
-          border-color: theme(buttonBGHoverColor); 
-          background-color: theme(buttonBGHoverColor); 
+        color: theme(buttonTextHoverColor);
+        border-color: theme(buttonBGHoverColor);
+        background-color: theme(buttonBGHoverColor);
       }
     }
-    
-    &.previous{
-        border-bottom-right-radius: 0;
+  
+    &.previous {
+      border-bottom-right-radius: 0;
     }
-    
-    &.next{
+  
+    &.next {
       border-bottom-left-radius: 0;
+    }
+  }
+  
+  .calendar-title {
+    border-color: transparent;
+    font-weight: bold;
+    font-size: 30px;
+    line-height: 30px;
+    white-space: nowrap;
+    @include themes() {
+      color: theme(textColor) !important;
+    }
   }
 }
-    
-.calendar-title{
+
+.calendar-table {
+  table-layout: fixed;
+
+  td, th {
+    @include themes() {
+      color: theme(textColor);
       border-color: transparent;
-      font-weight: bold;
-      font-size: 30px;
-      line-height: 20px;
-      white-space: nowrap;
-      @include themes() {
-        color: theme(textColor) !important;   
-      }
     }
+  }
 
-.calendar-table{
-      table-layout:fixed;
-      
-      td {
-        @include themes() {
-            color: theme(textColor);
-            border-color: lighten(theme(textColor), 50%);
-        }
-      }
-    tbody td{
-      height:140px;
-      min-width:115px;
-
-      &.current-day:not(.selected-day){
-        background: #FFC107 !important;
+  thead th {
+    padding: 5px 0px;
+  }
+  tbody td {
+    padding: 0; 
+    
+    div {
+      padding: 0;
+      overflow: hidden;
+      height: 92px;
+      border: 1px solid transparent !important;
+      border-radius: 5px;
+  
+      &.selected-day {
+        border-color: #ffc107 !important;
         font-weight: bold;
+        background-color: rgba(255, 193, 7, 0.4);
       }
-
-      &.selected-day{
-        background: #a2a2a2 !important;
-        font-weight: bold;
-      }
-
+  
       &:not(.selected-month) {
         @include themes() {
           color: rgba(theme(textColor), 0.4) !important;
-          background: rgba(theme(textColor), 0.1) !important;
         }
-        /*background: rgba(242, 242, 242, 0.5);
-        background: rgba(255, 255, 255, 0.2);*/
       }
-      
-      span{
-        display:block;
-        margin:3px -12px;
-        padding:2px 8px;
-        font-size:13px;
-        white-space:nowrap;
-        overflow:hidden;
+
+      span {
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
         text-overflow: ellipsis;
-      } 
-      
-      .additional-events{
-        background-color:#bbb;
+        font-size: 11px;
+        padding: 0;
+  
+        &:not(.day) {
+          margin: 2px 0px 0px 0px;
+        }
+        &.day {
+          padding-left: 5px !important;
+        }
+        &.additional-events {
+          background-color: #bbb;
+        }
       }
     }
-    
 
-    }
-
-
-    #lottoSearchResults {
-      max-height: 700px;
-      overflow: auto;
-    }
+  }
+}
