@@ -9,11 +9,9 @@ import { ModalComponent } from '@app/components/modal/modal.component';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  public Theme: any;
   @ViewChild('modalContainer', { read: ViewContainerRef, static: false }) modalContainer: ViewContainerRef;
 
   constructor(private resolver: ComponentFactoryResolver) {
-    this.Theme = Theme;
     Theme.init();
   }
 
@@ -23,5 +21,9 @@ export class AppComponent {
     const componentRef = this.modalContainer.createComponent(factory);
     componentRef.instance.modalComponent = PlaygroundPickerComponent;
     componentRef.instance.componentRef = componentRef;
+  }
+
+  toggleTheme(): void {
+    Theme.toggle();
   }
 }

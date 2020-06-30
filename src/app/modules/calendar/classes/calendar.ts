@@ -1,334 +1,130 @@
 import {CalendarEvent} from '../interfaces/calendar-event';
 import {Day} from '../interfaces/day';
-import { Subject } from 'rxjs';
 
 export class Calendar {
-  public static daysOfWeek = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
-  public static daysOfWeekLong = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  public static monthNames = ['Jan', 'Feb', 'Mar',
-    'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    public static monthNamesLong = ['January', 'February', 'March',
-      'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-  selectedDay: string;
-  dateChanged$: Subject<Date> = new Subject();
-
-  private _date: Date;
-  private _weeks: any[] = [];
-  private _events: CalendarEvent[];
-  private _min: Date;
-  private _max: Date;
-  private _sortedEvents: { [key: string]: { [key: string]: { [key: string]: CalendarEvent[] } } };
-
-  constructor({date = new Date(), events = [], min = new Date(1000, 0), max = new Date(9999, 11)} = {}) {
+  constructor({date = new Date(), events = []} = {}) {
+    this.date = date;
+    this.weeks = [];
     this.events = events;
-    this.min = min;
-    this.max = max;
-    this.setValidDate(date, true);
   }
+  public static daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  public static monthNames = ['January', 'February', 'March',
+    'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  public date: Date;
+  public month: string;
+  public year: number;
+  public weeks: any[];
+  public events: CalendarEvent[];
 
   // Get First Day of Selected Month - Day of Week 0-6
-  static getfirstWeekDayOfCurrMonth(month: number, year: number): number {
+  static getFirstDayOfMonth(month, year): number {
     return new Date(year, month).getDay();
   }
 
   // Get Last Day of Selected Month - Day of Week 0-6
-  static getlastWeekDayOfCurrMonth(month: number, year: number): number {
+  static getLastDayOfMonth(month, year): number {
     return new Date(year, month + 1, 0).getDay();
   }
 
   // Get Last Day of Selected Month - Day Number
-  static getDaysInMonth(month: number, year: number): number {
+  static getDaysInMonth(month, year): number {
     return new Date(year, month + 1, 0).getDate();
   }
 
-  static getlastDateOfLastMonth(month: number, year: number): number {
+  static getLastMonthLastDay(month, year): number {
     return new Date(year, month, 0).getDate();
   }
 
-  static dateToString(d: Date): string {
-    return d.getFullYear() + '-' +
-           ('0' + (d.getMonth() + 1 )).slice(-2) + '-' +
-           ('0' + d.getDate()).slice(-2);
-  }
-
-  static fullDateToString(day: number, month: number, year: number): string {
-    return parseInt(year as any, 10) + '-' +
-           ('0' + (parseInt(month as any, 10) + 1 )).slice(-2) + '-' +
-           ('0' + parseInt(day as any, 10)).slice(-2);
-  }
-
-  static stringToDate(date: string): Date {
-    return new Date(parseInt(date.split('-')[0], 10), parseInt(date.split('-')[1], 10) - 1, parseInt(date.split('-')[2], 10), 0, 0, 0, 0);
-  }
-
-  set date(date: Date) {
-    this.setValidDate(date, true);
-  }
-
-  get year() {
-    return this._date.getFullYear();
-  }
-
-  set year(year: string | number) {
-    if (!isNaN(year as any)) {
-      if (typeof year === 'string') {
-        year = parseInt(year, 10);
-      }
-      const date = new Date(this._date);
-      date.setFullYear(year);
-      this.setValidDate(date);
-    }
-  }
-
-  get month() {
-    return this._date.getMonth();
-  }
-
-  set month(month: number) {
-    const date = new Date(this._date);
-    date.setMonth(month);
-    this.setValidDate(date);
-  }
-
-  get monthString() {
-    return Calendar.monthNames[this._date.getMonth()];
-  }
-
-  get weeks() {
-    return this._weeks;
-  }
-
-  get min() {
-    return this._min;
-  }
-
-  set min(date: Date) {
-    if (date <= this.max || !this.max) {
-      this._min = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-    }
-  }
-
-  get max() {
-    return this._max;
-  }
-
-  set max(date: Date) {
-    if (date >= this.min || !this.min) {
-      this._max = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-    }
-  }
-
-  set events(events: CalendarEvent[]) {
-    this._events = events;
-    this.sortEvents();
-  }
-
-  get events() {
-    return this._events;
-  }
-
-  get isToday() { const today = new Date(); return this._date.getMonth() === today.getMonth() && this._date.getFullYear() === today.getFullYear() && this._date.getDate() === today.getDate(); }
-
-  get canMovePrev(): boolean { return this._date > this.min; }
-
-  get canMoveNext(): boolean { return this._date < this.max; }
-
   // Previous Month
   prevMonth(): void {
-    if (this.canMovePrev) {
-      const date = new Date(this._date);
-      date.setMonth(date.getMonth() - 1);
-      this.setValidDate(date);
-    }
+    this.date.setMonth(this.date.getMonth() - 1);
+    this.calculateDate();
   }
 
   // Next Month
   nextMonth(): void {
-    if (this.canMoveNext) {
-      const date = new Date(this._date);
-      date.setMonth(date.getMonth() + 1);
-      this.setValidDate(date);
-    }
+    this.date.setMonth(this.date.getMonth() + 1);
+    this.calculateDate();
   }
 
-  today(): void {
-    let today = new Date();
-    today = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0, 0);
-    if (!this.isToday) {
-      this.setValidDate(today, true);
-    }
-  }
-
-  addEvent(event: CalendarEvent, forceCalendarRefresh: boolean = false): void {
-    if (this.isEventWithinCalendarRange(event, this.min, this.max)) {
-      this._events.push(event);
-      this.addSortedEvent(event);
-      if (this.isEventWithinCalendarRange(event, this.getCalendarStartRange(), this.getCalendarEndRange())) {
-        this.refreshCalendar();
-      }
-    }
-  }
-
-  // Calculate Dates and Events
-  refreshCalendar(): void {
-    this._weeks = [];
+  // Calculate Date
+  calculateDate(): void {
+    this.month = Calendar.monthNames[this.date.getMonth()];
+    this.year = this.date.getFullYear();
+    this.weeks = [];
     let week = [];
 
     // Do Calculations
-    const lastDateOfLastMonth = Calendar.getlastDateOfLastMonth(this._date.getMonth(), this._date.getFullYear());
-    const firstWeekDayOfCurrMonth = Calendar.getfirstWeekDayOfCurrMonth(this._date.getMonth(), this._date.getFullYear());
-    const totalDaysInMonth = Calendar.getDaysInMonth(this._date.getMonth(), this._date.getFullYear());
-    const lastWeekDayOfCurrMonth = Calendar.getlastWeekDayOfCurrMonth(this._date.getMonth(), this._date.getFullYear());
-    const lastDayOffset = Calendar.daysOfWeek.length - 1 - lastWeekDayOfCurrMonth;
-    let fullMonthCount = firstWeekDayOfCurrMonth + totalDaysInMonth + lastDayOffset + 1; // Used For All Days In Loop
+    const lastMonthLastDay = Calendar.getLastMonthLastDay(this.date.getMonth(), this.date.getFullYear());
+    const firstDayOfMonth = Calendar.getFirstDayOfMonth(this.date.getMonth(), this.date.getFullYear());
+    const totalDaysInMonth = Calendar.getDaysInMonth(this.date.getMonth(), this.date.getFullYear());
+    const lastDayOfMonth = Calendar.getLastDayOfMonth(this.date.getMonth(), this.date.getFullYear());
+    const lastDayOffset = Calendar.daysOfWeek.length - 1 - lastDayOfMonth;
+    let fullMonthCount = firstDayOfMonth + totalDaysInMonth + lastDayOffset + 1; // Used For All Days In Loop
     const calculatedWeeks = Math.floor((fullMonthCount - 1) / Calendar.daysOfWeek.length);
     if (calculatedWeeks < 6) {// If Weeks Are Less Than 6 Weeks In Month - Add Extra Days
       fullMonthCount += Calendar.daysOfWeek.length;
     }
 
     // Calculate Dates
-    const lastMonth = new Date(this._date);
+    const lastMonth = new Date(this.date);
     lastMonth.setMonth(lastMonth.getMonth() - 1);
-    const nextMonth = new Date(this._date);
+    const nextMonth = new Date(this.date);
     nextMonth.setMonth(nextMonth.getMonth() + 1);
 
     // Set Dates
     for (let i = 0; i < fullMonthCount; i++) {
       const currentWeekCount = Math.floor(i / Calendar.daysOfWeek.length);
-      if (currentWeekCount > this._weeks.length) {// If New Week
-        this._weeks.push(week);
+      if (currentWeekCount > this.weeks.length) {// If New Week
+        this.weeks.push(week);
         week = [];
       }
-      let y, m, d;
-      if (i < firstWeekDayOfCurrMonth) {// Last Month
-        d = lastDateOfLastMonth - firstWeekDayOfCurrMonth + 1 + i;
-        m = lastMonth.getMonth();
-        y = lastMonth.getFullYear();
-      } else if (i < firstWeekDayOfCurrMonth + totalDaysInMonth) {// Current Month
-        d = i - firstWeekDayOfCurrMonth + 1;
-        m = this._date.getMonth();
-        y = this._date.getFullYear();
+
+      if (i < firstDayOfMonth) {// Last Month
+        const day = lastMonthLastDay - firstDayOfMonth + 1 + i;
+        week.push(this.getDayEvents(day, lastMonth.getMonth(), lastMonth.getFullYear()));
+      } else if (i < firstDayOfMonth + totalDaysInMonth) {// Current Month
+        const day = i - firstDayOfMonth + 1;
+        week.push(this.getDayEvents(day, this.date.getMonth(), this.date.getFullYear()));
       } else {// Next Month
-        d = i - totalDaysInMonth - firstWeekDayOfCurrMonth + 1;
-        m = nextMonth.getMonth();
-        y = nextMonth.getFullYear();
-      }
-      week.push(this.getDayEvents(d, m, y));
-    }
-  }
-
-  private setValidDate(dateToCheck: Date, selectDate: boolean = false) {
-    const currDate = new Date(this._date);
-    if (selectDate) {
-      this.selectedDay = Calendar.dateToString(dateToCheck);
-    } else {
-      this.selectedDay = '';
-    }
-    if (dateToCheck >= this.min && dateToCheck <= this.max) {
-      this._date = new Date(dateToCheck);
-    } else if (dateToCheck < this.min) {
-      this._date = new Date(this.min);
-    } else if (dateToCheck > this.max) {
-      this._date = new Date(this.max);
-    }
-    const dateChanged = currDate.getMonth() !== this.month || currDate.getFullYear() !== this.year;
-    if (dateChanged) {
-      this.refreshCalendar();
-      this.dateChanged$.next(this._date);
-    }
-  }
-
-  private getSortedEvents(year: number, month?: number, day?: number): CalendarEvent[] {
-    if (this._sortedEvents) {
-      if (year != null && month == null && day == null) {
-        return (Object.values(this._sortedEvents[year]) as any).flatMap((m) => (Object.values(m) as any).flatMap((mv) => mv)) || [];
-      } else if (year != null && month != null && day == null) {
-        if (this._sortedEvents[year] && this._sortedEvents[year][month]) {
-          return (Object.values(this._sortedEvents[year][month]) as any).flatMap((m) => m) || [];
-        }
-        return [];
-      } else if (year != null && month != null && day != null) {
-        if (this._sortedEvents[year] && this._sortedEvents[year][month] && this._sortedEvents[year][month][day]) {
-          return this._sortedEvents[year][month][day] || [];
-        }
-        return [];
-      }
-    }
-    return [];
-  }
-
-  private sortEvents() {
-    this._sortedEvents = {};
-    this._events.forEach((event) => {
-      this.addSortedEvent(event);
-    });
-  }
-
-  private addSortedEvent(event: CalendarEvent) {
-    if (!this._sortedEvents[event.startDate.getFullYear()]) {
-      this._sortedEvents[event.startDate.getFullYear()] = {};
-    }
-    if (!this._sortedEvents[event.startDate.getFullYear()][event.startDate.getMonth()]) {
-      this._sortedEvents[event.startDate.getFullYear()][event.startDate.getMonth()] = {};
-    }
-    if (!this._sortedEvents[event.startDate.getFullYear()][event.startDate.getMonth()][event.startDate.getDate()]) {
-      this._sortedEvents[event.startDate.getFullYear()][event.startDate.getMonth()][event.startDate.getDate()] = [];
-    }
-    this._sortedEvents[event.startDate.getFullYear()][event.startDate.getMonth()][event.startDate.getDate()].push(event);
-
-    this._sortedEvents[event.startDate.getFullYear()][event.startDate.getMonth()][event.startDate.getDate()]
-    .sort((a: CalendarEvent, b: CalendarEvent) => {
-      const eventEndDateA = a.endDate || a.startDate;
-      const eventEndDateB = b.endDate || b.startDate;
-      const dateRangeA = Math.abs(a.startDate.getTime() - eventEndDateA.getTime());
-      const dateRangeB = Math.abs(b.startDate.getTime() - eventEndDateB.getTime());
-      if (dateRangeA > dateRangeB) { // A Date Range Is More Than B
-        return -1;
-      } else if (dateRangeA < dateRangeB) { // A Date Range Is More Than B
-        return 1;
-      } else { return 0; }
-    });
-  }
-
-  private getCalendarStartRange(): Date {
-    const lastDateOfLastMonth = Calendar.getlastDateOfLastMonth(this._date.getMonth(), this._date.getFullYear());
-    const firstWeekDayOfCurrMonth = Calendar.getfirstWeekDayOfCurrMonth(this._date.getMonth(), this._date.getFullYear());
-    const lastMonth = new Date(this._date);
-    lastMonth.setMonth(lastMonth.getMonth() - 1);
-    return new Date(lastMonth.getFullYear(), lastMonth.getMonth(), lastDateOfLastMonth - firstWeekDayOfCurrMonth + 1);
-  }
-
-  private getCalendarEndRange(): Date {
-    const firstWeekDayOfCurrMonth = Calendar.getfirstWeekDayOfCurrMonth(this._date.getMonth(), this._date.getFullYear());
-    const totalDaysInMonth = Calendar.getDaysInMonth(this._date.getMonth(), this._date.getFullYear());
-    const lastWeekDayOfCurrMonth = Calendar.getlastWeekDayOfCurrMonth(this._date.getMonth(), this._date.getFullYear());
-    const lastDayOffset = Calendar.daysOfWeek.length - 1 - lastWeekDayOfCurrMonth;
-    let fullMonthCount = firstWeekDayOfCurrMonth + totalDaysInMonth + lastDayOffset + 1; // Used For All Days In Loop
-    const calculatedWeeks = Math.floor((fullMonthCount - 1) / Calendar.daysOfWeek.length);
-    if (calculatedWeeks < 6) {// If Weeks Are Less Than 6 Weeks In Month - Add Extra Days
-      fullMonthCount += Calendar.daysOfWeek.length;
+        const day = i - totalDaysInMonth - firstDayOfMonth + 1;
+        week.push(this.getDayEvents(day, nextMonth.getMonth(), nextMonth.getFullYear())); }// Events For Next Month
     }
 
-    // Calculate Dates
-    const nextMonth = new Date(this._date);
-    nextMonth.setMonth(nextMonth.getMonth() + 1);
-    return new Date(nextMonth.getFullYear(), nextMonth.getMonth(), fullMonthCount - totalDaysInMonth - firstWeekDayOfCurrMonth + 1);
-  }
-
-  private isEventWithinCalendarRange(event: CalendarEvent, startDate: Date, endDate: Date) {
-    const eventEndDate = event.endDate || event.startDate;
-      return (event.startDate >= startDate && event.startDate <= endDate) ||
-      (eventEndDate >= startDate && eventEndDate <= endDate) ||
-      (event.startDate <= startDate && eventEndDate >= endDate);
   }
 
   getDayEvents(day: number, month: number, year: number): Day {
+    const today = new Date();
+    const searchDate = new Date(year, month, day);
+    const events: CalendarEvent[] = this.events.filter((event) => {
+      return event.startDate <= searchDate && event.endDate >= searchDate;
+    });
+
+    // Sort Events By Start Date
+    // If Same Start Date Sort Events By How Much Days They Span - Makes Longer Ranged Dates Stay On Top
+    events.sort((a: CalendarEvent, b: CalendarEvent) => {
+      if (a.startDate.getTime() < b.startDate.getTime()) { // A Occurs Before B
+        return -1;
+      } else if (a.startDate.getTime() > b.startDate.getTime()) { // A Occurs After B
+        return 1;
+      } else {
+        const dateRangeA = Math.abs(a.startDate.getTime() - a.endDate.getTime());
+        const dateRangeB = Math.abs(b.startDate.getTime() - b.endDate.getTime());
+        if (dateRangeA > dateRangeB) { // A Date Range Is More Than B
+          return -1;
+        } else if (dateRangeA < dateRangeB) { // A Date Range Is More Than B
+          return 1;
+        } else { return 0; }
+      }
+    });
+
     return {
-      day,
-      month,
-      year,
-      date: Calendar.fullDateToString(day, month, year),
-      events: this.getSortedEvents(year, month, day)
+      day: day,
+      selectedMonth: this.date.getMonth() === month,
+      currentDay: today.getDate() === day,
+      currentMonth: today.getMonth() === month,
+      currentYear: today.getFullYear() === year,
+      events: events
     };
   }
 

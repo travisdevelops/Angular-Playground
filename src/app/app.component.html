@@ -1,5 +1,13 @@
-<div id="top-nav" class="d-flex flex-row align-items-center p-2">
+<div id="top-nav" class="d-flex flex-row align-items-center p-3">
       <h5 class="mb-0 mt-0 mr-auto font-weight-normal">Angular Playground</h5>
+      <span class="mr-4">
+        <label class="toggle" for="toggler">
+          <input type="checkbox" id="toggler" (change)="toggleTheme()" [(ngModel)]="Theme.darkThemeToggled">
+          <fa-icon icon="sun" class="toggle-icon toggle-icon-left"></fa-icon>
+          <span></span>
+          <fa-icon icon="moon" class="toggle-icon toggle-icon-right"></fa-icon>
+        </label>
+      </span>
       <button class="btn top-nav-button" (click)="openPlaygroundPicker()">Playground Picker</button>
 </div>
 <router-outlet></router-outlet>

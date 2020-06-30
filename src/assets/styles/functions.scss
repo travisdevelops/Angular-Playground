@@ -1,3 +1,6 @@
+@import 'variables.scss';
+@import 'mixins.scss';
+
 /* @include themes() { color: theme(buttonTextColor); } */
 @function theme($key) {
   @return map-get($current-theme, $key);

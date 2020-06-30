@@ -23,7 +23,7 @@ export class Particle extends CanvasObject {
 
   // Override Move
   move(): void {
-    if (this.isOutsideCanvas(this.getPotentialPosition())) {
+    if (this.isOutsideCanvas(this.getPositionUsingSpeed())) {
       this.randomizeSpeed();
     } else { super.move(); }
   }
@@ -32,6 +32,14 @@ export class Particle extends CanvasObject {
   respawn(): void {
     this.randomizeSpeed();
     this.randomizePosition();
+  }
+
+  // Get Position That Is Inside Core Width/Radius
+  randomizePosition(): void {
+    this.position = new Vector({x: Sketch.p5.random(0, Sketch.p5.width), y: Sketch.p5.random(0, Sketch.p5.height)});
+    if (this.isOutsideCanvas(this.position)) {
+      this.randomizePosition();
+    }
   }
 
   // Connect To Another Particle if Distance Is Within Connection Length
