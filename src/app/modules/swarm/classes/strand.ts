@@ -3,108 +3,63 @@ import {CanvasObject} from '@classes/canvas-object';
 import {Sketch} from '@classes/sketch';
 
 export class Strand extends CanvasObject {
-  private lastPositions: Vector[];
-  private glowEffectSizeMultiplier = 3;
-  public tailLength = 15;
-  public tailHasTaperedAlpha = true;
-  public tailHasTaperedSize = true;
-  private randomMovementTimeout;
-  public visionRadius: number;
+  private tails: Vector[];
+  private tailMax: number;
 
-  constructor({color = new Vector(), minSpeed = new Vector({x: 0.5, y: 0.5}), maxSpeed = new Vector({x: 2, y: 2}), size = new Vector({x: 4, y: 4}), position = new Vector({x: 0, y: 0}), visionRadius = 15} = {}) {
+  constructor() {
     super();
-    this.color = color;
-    this.maxSpeed = maxSpeed;
-    this.minSpeed = minSpeed;
-    this.size = size;
-    this.position = position;
-    this.visionRadius = visionRadius;
-    this.lastPositions = [];
+    this.color = new Vector({x: 188, y: 254, z: 0});
+    this.maxSpeed = new Vector({x: 2, y: 2});
+    this.minSpeed = new Vector({x: 0.5, y: 0.5});
+    this.size = new Vector({x: 2, y: 2});
+    this.position = new Vector({x: 0, y: 0});
+    this.tails = [];
+    this.tailMax = 15;
   }
 
   // Randomize Movements On A Random Interval That Continues To Change
-  randomizeMovements(): void {
-    this.stopRandomMovements();
+  randomizeMovements() {
     this.randomizeSpeed();
-    this.randomMovementTimeout = setTimeout(() => {this.randomizeMovements(); }, Math.floor(Sketch.p5.random(200, 800)));
-  }
-
-  stopRandomMovements(): void {
-    if (this.randomMovementTimeout != null) {
-      clearTimeout(this.randomMovementTimeout);
-    }
+    setTimeout(this.randomizeMovements, Sketch.p5.random(200, 800));
   }
 
   // Display Strand With Glow
-  display(): void {
-    this.displayBody();
-    // this.displayGlowEffect();
-    this.displayTail();
-    this.displayVision();
-  }
-
-  private displayBody(): void {
+  display() {
     Sketch.p5.noStroke();
     Sketch.p5.fill(this.color.x, this.color.y, this.color.z);
-    Sketch.p5.ellipse(this.position.x, this.position.y, this.size.x);
-  }
-
-  // Glow Effect
-  private displayGlowEffect(): void {
-    Sketch.p5.fill(this.color.x, this.color.y, this.color.z, 80);
-    Sketch.p5.ellipse(this.position.x, this.position.y, this.size.x * this.glowEffectSizeMultiplier);
+    Sketch.p5.ellipse(this.position.x, this.position.y, this.size.x * 2);
+    // Glow Effect
+    Sketch.p5.fill(this.color.x, this.color.y, this.color.z, 75);
+    Sketch.p5.ellipse(this.position.x, this.position.y, this.size.x * 6);
+    this.displayTails();
   }
 
   // Display Tails
-  private displayTail(): void {
+  private displayTails() {
     Sketch.p5.noFill();
-    const tailSizeTaperRate = this.size.x / this.lastPositions.length;
-    const tailAlphaTaperRate = 255 / this.lastPositions.length;
-    for (let i = 0; i < this.lastPositions.length - 1; i++) {
-      const currTailPos = this.lastPositions[i];
-      const nextTailPos = this.lastPositions[i + 1];
-      let tailAlpha = 255;
-      let tailSize = this.size.x;
-      if (this.tailHasTaperedAlpha) {
-        tailAlpha = 255 - (tailAlphaTaperRate * (i + 1)); // Make Tail Taper in Alpha
-      }
-      if (this.tailHasTaperedSize) {
-        tailSize = this.size.x - (tailSizeTaperRate * (i + 1)); // Make Tail Taper in Width
-      }
-      Sketch.p5.stroke(this.color.x, this.color.y, this.color.z, tailAlpha);
-      Sketch.p5.strokeWeight(tailSize);
-      Sketch.p5.line(currTailPos.x, currTailPos.y, nextTailPos.x, nextTailPos.y); // Actual Tail
+    for (let i = 0; i < this.tails.length - 1; i++) {
+      const level = 3 - Math.floor(i / (this.tails.length / 3));
+      Sketch.p5.stroke(this.color.x, this.color.y, this.color.z, 255 - (level * 50)); // Make Tail Taper in Alpha
+      Sketch.p5.strokeWeight(this.size.x + 1 - (level * 0.5)); // Make Tail Taper in Width
+      Sketch.p5.line(this.tails[i].x, this.tails[i].y, this.tails[i + 1].x, this.tails[i + 1].y); // Actual Tail
     }
-  }
-
-
-  private displayVision(): void {
-    Sketch.p5.noStroke();
-    // Glow Effect
-    Sketch.p5.fill(this.color.x, this.color.y, this.color.z, 40);
-    Sketch.p5.ellipse(this.position.x, this.position.y, this.visionRadius * 2);
   }
 
   // Add Tail After Moving - Overrides the Parent Method
-  move(): void {
+  move() {
     super.move();
-    this.saveLastPosition();
+    this.addTail();
   }
 
-
-  // Save Last Position As First In Array
-  // Always Keeps At Least 1 Vector Of Position in Array
-  private saveLastPosition(): void {
-    const lastPositionIsSameAsCurrent = this.lastPositions.length > 0 && this.lastPositions[0].x === this.position.x
-      && this.lastPositions[0].y === this.position.y;
-
-    if (this.lastPositions.length > 1 && lastPositionIsSameAsCurrent || this.lastPositions.length > this.tailLength) {
-      this.lastPositions.pop(); // Remove From End of Array
+  // Add Tail To Array of Tails & Remove First Tail If More Than Tail Length Threshold
+  addTail() {
+    if (this.tails.length >= this.tailMax) {
+      this.tails.shift();
     }
-    // Only Add Last Position If Different From Current
-    if (!lastPositionIsSameAsCurrent) {
-      this.lastPositions.unshift(new Vector({ x: this.position.x, y: this.position.y })); // Add to Front of Array
-    }
+    this.tails.push(new Vector({
+      x: this.position.x,
+      y: this.position.y
+    }));
   }
 }
 

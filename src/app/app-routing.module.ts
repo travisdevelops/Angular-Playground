@@ -6,8 +6,7 @@ const routes: Routes = [{ path: '', component: HomeComponent },
   { path: 'connection', loadChildren: './modules/connection/connection.module#ConnectionModule' },
 { path: 'calendar', loadChildren: './modules/calendar/calendar.module#CalendarModule' },
 { path: 'emitter', loadChildren: './modules/emitter/emitter.module#EmitterModule' },
-  { path: 'swarm', loadChildren: './modules/swarm/swarm.module#SwarmModule' },
-  { path: 'maze', loadChildren: './modules/maze/maze.module#MazeModule' }];
+  { path: 'swarm', loadChildren: './modules/swarm/swarm.module#SwarmModule' }];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],

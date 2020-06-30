@@ -19,13 +19,14 @@ export class ModalComponent implements OnInit {
   @ViewChild('modalTemplate', {read: ViewContainerRef, static: true}) modalTemplate: ViewContainerRef;
   @ViewChild('modalContainer', {static: true}) modalContainer: ElementRef;
 
-  constructor(private resolver: ComponentFactoryResolver) { }
+  constructor(private resolver: ComponentFactoryResolver, private elem: ElementRef) { }
 
   ngOnInit() {
     const factory = this.resolver.resolveComponentFactory(this.modalComponent);
     this.modalTemplate.createComponent(factory);
     $(this.modalContainer.nativeElement).modal();
-    $(this.modalContainer.nativeElement).on('hidden.bs.modal', () => {
+    $(this.modalContainer.nativeElement).on('hidden.bs.modal', (e) => {
+      console.log(this.componentRef);
       this.componentRef.destroy();
     });
   }
