@@ -7,13 +7,14 @@ export class Calendar {
   public static daysOfWeekLong = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   public static monthNames = ['Jan', 'Feb', 'Mar',
     'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    public static monthNamesLong = ['January', 'February', 'March',
-      'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  public static monthNamesLong = ['January', 'February', 'March',
+    'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  public static dayCount = 42;
   selectedDay: string;
   dateChanged$: Subject<Date> = new Subject();
 
   private _date: Date;
-  private _weeks: any[] = [];
+  private _weeks: Day[][] = [];
   private _events: CalendarEvent[];
   private _min: Date;
   private _max: Date;
@@ -24,25 +25,6 @@ export class Calendar {
     this.min = min;
     this.max = max;
     this.setValidDate(date, true);
-  }
-
-  // Get First Day of Selected Month - Day of Week 0-6
-  static getfirstWeekDayOfCurrMonth(month: number, year: number): number {
-    return new Date(year, month).getDay();
-  }
-
-  // Get Last Day of Selected Month - Day of Week 0-6
-  static getlastWeekDayOfCurrMonth(month: number, year: number): number {
-    return new Date(year, month + 1, 0).getDay();
-  }
-
-  // Get Last Day of Selected Month - Day Number
-  static getDaysInMonth(month: number, year: number): number {
-    return new Date(year, month + 1, 0).getDate();
-  }
-
-  static getlastDateOfLastMonth(month: number, year: number): number {
-    return new Date(year, month, 0).getDate();
   }
 
   static dateToString(d: Date): string {
@@ -59,6 +41,20 @@ export class Calendar {
 
   static stringToDate(date: string): Date {
     return new Date(parseInt(date.split('-')[0], 10), parseInt(date.split('-')[1], 10) - 1, parseInt(date.split('-')[2], 10), 0, 0, 0, 0);
+  }
+
+  // Get First Day of Selected Month - Day of Week 0-6
+  private getfirstWeekDayOfCurrMonth(): number {
+    return new Date(this._date.getFullYear(), this._date.getMonth()).getDay();
+  }
+
+  // Get Last Day of Selected Month - Day Number
+  private getDaysInMonth(): number {
+    return new Date(this._date.getFullYear(), this._date.getMonth() + 1, 0).getDate();
+  }
+
+  private getlastDateOfLastMonth(): number {
+    return new Date(this._date.getFullYear(), this._date.getMonth(), 0).getDate();
   }
 
   set date(date: Date) {
@@ -171,20 +167,13 @@ export class Calendar {
 
   // Calculate Dates and Events
   refreshCalendar(): void {
+    const cachedDays: Day[] = ([...this._weeks] as any).flatMap((s) => s);
     this._weeks = [];
-    let week = [];
 
     // Do Calculations
-    const lastDateOfLastMonth = Calendar.getlastDateOfLastMonth(this._date.getMonth(), this._date.getFullYear());
-    const firstWeekDayOfCurrMonth = Calendar.getfirstWeekDayOfCurrMonth(this._date.getMonth(), this._date.getFullYear());
-    const totalDaysInMonth = Calendar.getDaysInMonth(this._date.getMonth(), this._date.getFullYear());
-    const lastWeekDayOfCurrMonth = Calendar.getlastWeekDayOfCurrMonth(this._date.getMonth(), this._date.getFullYear());
-    const lastDayOffset = Calendar.daysOfWeek.length - 1 - lastWeekDayOfCurrMonth;
-    let fullMonthCount = firstWeekDayOfCurrMonth + totalDaysInMonth + lastDayOffset + 1; // Used For All Days In Loop
-    const calculatedWeeks = Math.floor((fullMonthCount - 1) / Calendar.daysOfWeek.length);
-    if (calculatedWeeks < 6) {// If Weeks Are Less Than 6 Weeks In Month - Add Extra Days
-      fullMonthCount += Calendar.daysOfWeek.length;
-    }
+    const lastDateOfLastMonth = this.getlastDateOfLastMonth();
+    const firstWeekDayOfCurrMonth = this.getfirstWeekDayOfCurrMonth();
+    const totalDaysInMonth = this.getDaysInMonth();
 
     // Calculate Dates
     const lastMonth = new Date(this._date);
@@ -192,13 +181,9 @@ export class Calendar {
     const nextMonth = new Date(this._date);
     nextMonth.setMonth(nextMonth.getMonth() + 1);
 
+    let week: Day[] = [];
     // Set Dates
-    for (let i = 0; i < fullMonthCount; i++) {
-      const currentWeekCount = Math.floor(i / Calendar.daysOfWeek.length);
-      if (currentWeekCount > this._weeks.length) {// If New Week
-        this._weeks.push(week);
-        week = [];
-      }
+    for (let i = 0; i < Calendar.dayCount; i++) {
       let y, m, d;
       if (i < firstWeekDayOfCurrMonth) {// Last Month
         d = lastDateOfLastMonth - firstWeekDayOfCurrMonth + 1 + i;
@@ -213,7 +198,23 @@ export class Calendar {
         m = nextMonth.getMonth();
         y = nextMonth.getFullYear();
       }
-      week.push(this.getDayEvents(d, m, y));
+
+      const date = Calendar.fullDateToString(d, m, y);
+      const cachedDay = cachedDays.find((cd) => cd.date === date);
+      console.log(i);
+      if (cachedDay) {
+        week.push({...cachedDay});
+        console.log('Cached ' + date );
+      } else {
+        console.log(d, m, y);
+        week.push(this.getDayEvents(d, m, y));
+      }
+      
+      const currentWeekCount = Math.floor((i + 1) / Calendar.daysOfWeek.length);
+      if (currentWeekCount > this._weeks.length) {// If New Week
+        this._weeks.push(week);
+        week = [];
+      }
     }
   }
 
@@ -291,28 +292,21 @@ export class Calendar {
   }
 
   private getCalendarStartRange(): Date {
-    const lastDateOfLastMonth = Calendar.getlastDateOfLastMonth(this._date.getMonth(), this._date.getFullYear());
-    const firstWeekDayOfCurrMonth = Calendar.getfirstWeekDayOfCurrMonth(this._date.getMonth(), this._date.getFullYear());
+    const lastDateOfLastMonth = this.getlastDateOfLastMonth();
+    const firstWeekDayOfCurrMonth = this.getfirstWeekDayOfCurrMonth();
     const lastMonth = new Date(this._date);
     lastMonth.setMonth(lastMonth.getMonth() - 1);
     return new Date(lastMonth.getFullYear(), lastMonth.getMonth(), lastDateOfLastMonth - firstWeekDayOfCurrMonth + 1);
   }
 
   private getCalendarEndRange(): Date {
-    const firstWeekDayOfCurrMonth = Calendar.getfirstWeekDayOfCurrMonth(this._date.getMonth(), this._date.getFullYear());
-    const totalDaysInMonth = Calendar.getDaysInMonth(this._date.getMonth(), this._date.getFullYear());
-    const lastWeekDayOfCurrMonth = Calendar.getlastWeekDayOfCurrMonth(this._date.getMonth(), this._date.getFullYear());
-    const lastDayOffset = Calendar.daysOfWeek.length - 1 - lastWeekDayOfCurrMonth;
-    let fullMonthCount = firstWeekDayOfCurrMonth + totalDaysInMonth + lastDayOffset + 1; // Used For All Days In Loop
-    const calculatedWeeks = Math.floor((fullMonthCount - 1) / Calendar.daysOfWeek.length);
-    if (calculatedWeeks < 6) {// If Weeks Are Less Than 6 Weeks In Month - Add Extra Days
-      fullMonthCount += Calendar.daysOfWeek.length;
-    }
+    const firstWeekDayOfCurrMonth = this.getfirstWeekDayOfCurrMonth();
+    const totalDaysInMonth = this.getDaysInMonth();
 
     // Calculate Dates
     const nextMonth = new Date(this._date);
     nextMonth.setMonth(nextMonth.getMonth() + 1);
-    return new Date(nextMonth.getFullYear(), nextMonth.getMonth(), fullMonthCount - totalDaysInMonth - firstWeekDayOfCurrMonth + 1);
+    return new Date(nextMonth.getFullYear(), nextMonth.getMonth(), Calendar.dayCount - totalDaysInMonth - firstWeekDayOfCurrMonth + 1);
   }
 
   private isEventWithinCalendarRange(event: CalendarEvent, startDate: Date, endDate: Date) {
