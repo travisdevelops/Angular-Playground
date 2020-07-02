@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { Calendar } from '../classes/calendar';
 import { CalendarEvent } from '../interfaces/calendar-event';
 import ParsedLottoJSON from '../../../../assets/parsed-lotto.json';
-import MissingLottoJSON from '../../../../assets/missing-lotto.json';
 import { Vector } from '@app/classes/vector';
 import { takeUntil, tap, map, catchError } from 'rxjs/operators';
 import { Subject, Observable, from, of } from 'rxjs';
@@ -26,14 +25,13 @@ export class LottoDataService {
           { midday: false, value: data.numbersEvening, color: new Vector({x: 76, y: 175, z: 80})},
           { midday: false, value: data.win4Evening, color: new Vector({x: 76, y: 175, z: 80})}].forEach((p) => {
           if (p.value) {
-            // const title = p.midday ? 'M: ' + p.value : 'E: ' + p.value;
-            const title = p.value;
             calendarEvents.push({
-              title,
+              title: p.value,
               color: p.color,
               startDate: Calendar.stringToDate(data.date),
               meta: {
-                number: p.value
+                number: p.value,
+                midday: p.midday
               }
             });
           }
@@ -81,14 +79,14 @@ export class LottoDataService {
     const allData = this.removeDuplicates([...val, ...ParsedLottoJSON])
     .sort((a, b) => (Calendar.stringToDate(b.date) as any) - (Calendar.stringToDate(a.date) as any))
     .reverse();
-    this.copyToClickBoard('Lotto Data', allData).subscribe((res) => {
+    this.copyToClipBoard('Lotto Data', allData).subscribe((res) => {
       if (res) {
         this.getLottoStatistics(allData);
       }
     });
   }
 
-  private copyToClickBoard(message: string, data: any): Observable<boolean> {
+  private copyToClipBoard(message: string, data: any): Observable<boolean> {
     confirm('Focusing To Copy Clipboard');
     return from(navigator.clipboard.writeText(JSON.stringify(data))).pipe(
       tap(() => console.log('Copied to Clipboard: ' + message)),
@@ -127,7 +125,7 @@ export class LottoDataService {
     obj.win4Midday.sort((a, b) => b.count - a.count);
     obj.win4Evening.sort((a, b) => b.count - a.count);
 
-    this.copyToClickBoard('Lotto Statistics', obj).subscribe();
+    this.copyToClipBoard('Lotto Statistics', obj).subscribe();
   }
 
   private removeDuplicates(data) {
@@ -140,37 +138,4 @@ export class LottoDataService {
       return [...unique, item];
     }, []);
   }
-
-  private getDatesWithoutLotto(calendar: Calendar) {
-    const emptyDates: string[] = [];
-    const currDate = new Date(calendar.min);
-    const today = new Date();
-    while (currDate < today) {
-      const day = calendar.getDayEvents(currDate.getDate(), currDate.getMonth(), currDate.getFullYear());
-      if (day && day.events && day.events.length === 0) {
-        emptyDates.push(Calendar.dateToString(currDate));
-      }
-      currDate.setDate(currDate.getDate() + 1);
-    }
-    console.log(JSON.stringify(emptyDates));
-  }
-
-  private convertMissingLottoRecords() {
-   const val = [];
-
-   MissingLottoJSON.forEach((record) => {
-     const existIndex = val.findIndex((v) => v.date === record.date);
-       if (existIndex !== -1) {
-         val[existIndex] = {...val[existIndex], ...record};
-       } else {
-         val.push(record);
-       }
-   });
-
-   if (val.length > 0) {
-     this.getUpdatedLottoData(val);
-   } else {
-     console.log('No Update Needed');
-   }
- }
 }
