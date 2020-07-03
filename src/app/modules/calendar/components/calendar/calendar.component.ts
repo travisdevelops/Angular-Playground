@@ -1,9 +1,9 @@
-import { Component, OnInit, ChangeDetectorRef, OnDestroy, Input } from '@angular/core';
-import { Calendar } from '../../classes/calendar';
-import { CalendarEvent } from '../../interfaces/calendar-event';
-import { FormControl, FormBuilder } from '@angular/forms';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
+import { Calendar } from '../../classes';
+import { CalendarEvent } from '../../interfaces';
+import { FormControl, } from '@angular/forms';
 import { Subject } from 'rxjs';
-import { takeUntil, tap, filter, distinctUntilChanged, debounceTime } from 'rxjs/operators';
+import { takeUntil, tap, filter, distinctUntilChanged } from 'rxjs/operators';
 
 
 @Component({
@@ -23,7 +23,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
   private _destroyed$: Subject<any> = new Subject();
 
-  constructor(private cdRef: ChangeDetectorRef, private fb: FormBuilder) {}
+  constructor() {}
 
   ngOnInit() {
     this.createCalendar();
@@ -50,12 +50,23 @@ export class CalendarComponent implements OnInit, OnDestroy {
     this.month = new FormControl({ value: this.calendar.month, disabled: true});
   }
 
-  editYear() {
+  editYear($event, yearControl) {
+    this.hideMonthYear();
+    $event.stopPropagation();
     this.year.enable({emitEvent: false});
+    setTimeout(() => {
+      yearControl.focus();
+    }, 200);
   }
 
   editMonth() {
+    this.hideMonthYear();
     this.month.enable({emitEvent: false});
+  }
+
+  hideMonthYear() {
+    this.month.disable();
+    this.year.disable();
   }
 
   handleFormChanges() {
@@ -65,17 +76,20 @@ export class CalendarComponent implements OnInit, OnDestroy {
       tap((month) => {
         this.calendar.month = month;
         this.month.setValue(this.calendar.month);
+        this.hideMonthYear();
       }),
       takeUntil(this._destroyed$)
     ).subscribe();
 
     this.year.valueChanges.pipe(
       distinctUntilChanged(),
-      debounceTime(500),
       filter(() => this.year.enabled),
       tap((year) => {
-        this.calendar.year = year;
-        this.year.setValue(this.calendar.year);
+        if (year.length === 4) {
+          this.calendar.year = year;
+          this.year.setValue(this.calendar.year);
+          this.hideMonthYear();
+        }
       }),
       takeUntil(this._destroyed$)
     ).subscribe();

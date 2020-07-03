@@ -76,6 +76,14 @@ th {
     @include themes() {
       color: theme(textColor) !important;
     }
+    
+    .calendar-input {
+      width: 70px; 
+      height: 30px; 
+      padding: 0;
+      vertical-align: bottom; 
+      font-size: 21px;
+    }
   }
 }
 
