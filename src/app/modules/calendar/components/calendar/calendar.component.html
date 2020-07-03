@@ -2,16 +2,17 @@
   <div class="row calendar-header pt-2">
     <div class="col">
       <span class="calendar-title">
+        <!-- Month -->
         <ng-container *ngIf="!month || month && month.disabled">
-          <span (click)="editMonth()">{{calendar.monthString}} </span>
+          <span (click)="editMonth(monthControl)">{{calendar.monthString}} </span>
         </ng-container> 
-        <ng-container *ngIf="month && month.enabled">
-          <select [formControl]="month" class="calendar-input">
-              <option [value]="i" *ngFor="let m of Calendar.monthNames; index as i">{{m}}</option>
-          </select>
-        </ng-container>
+        <select [formControl]="month" class="calendar-input" [class.d-none]="!(month && month.enabled)"
+         (blur)="hideMonthYear()" #monthControl>
+            <option [value]="i" *ngFor="let m of Calendar.monthNames; index as i">{{m}}</option>
+        </select>
+        <!-- Year -->
         <ng-container *ngIf="!year || year && year.disabled">
-          <span (click)="editYear($event, yearControl)">{{calendar.year}}</span>
+          <span (click)="editYear(yearControl)">{{calendar.year}}</span>
         </ng-container>
         <input [formControl]="year" [class.d-none]="!(year && year.enabled)" class="calendar-input" 
         (blur)="hideMonthYear()" #yearControl />

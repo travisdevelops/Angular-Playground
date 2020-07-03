@@ -50,18 +50,16 @@ export class CalendarComponent implements OnInit, OnDestroy {
     this.month = new FormControl({ value: this.calendar.month, disabled: true});
   }
 
-  editYear($event, yearControl) {
+  editYear(yearControl: HTMLElement) {
     this.hideMonthYear();
-    $event.stopPropagation();
     this.year.enable({emitEvent: false});
-    setTimeout(() => {
-      yearControl.focus();
-    }, 200);
+    setTimeout(() => { yearControl.focus(); }, 0);
   }
 
-  editMonth() {
+  editMonth(monthControl: HTMLElement) {
     this.hideMonthYear();
     this.month.enable({emitEvent: false});
+    setTimeout(() => { monthControl.focus(); }, 0);
   }
 
   hideMonthYear() {

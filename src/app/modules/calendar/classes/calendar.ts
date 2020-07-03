@@ -209,7 +209,7 @@ export class Calendar {
         // console.log(d, m, y);
         week.push(this.getDayEvents(d, m, y));
       }
-      
+
       const currentWeekCount = Math.floor((i + 1) / Calendar.daysOfWeek.length);
       if (currentWeekCount > this._weeks.length) {// If New Week
         this._weeks.push(week);
@@ -223,7 +223,7 @@ export class Calendar {
     if (selectDate) {
       this.selectedDay = Calendar.dateToString(dateToCheck);
     } else {
-      this.selectedDay = '';
+      this.selectedDay = Calendar.dateToString(new Date());
     }
     if (dateToCheck >= this.min && dateToCheck <= this.max) {
       this._date = new Date(dateToCheck);
