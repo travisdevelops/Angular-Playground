@@ -201,12 +201,12 @@ export class Calendar {
 
       const date = Calendar.fullDateToString(d, m, y);
       const cachedDay = cachedDays.find((cd) => cd.date === date);
-      console.log(i);
+      // console.log(i);
       if (cachedDay) {
         week.push({...cachedDay});
-        console.log('Cached ' + date );
+        // console.log('Cached ' + date );
       } else {
-        console.log(d, m, y);
+        // console.log(d, m, y);
         week.push(this.getDayEvents(d, m, y));
       }
       

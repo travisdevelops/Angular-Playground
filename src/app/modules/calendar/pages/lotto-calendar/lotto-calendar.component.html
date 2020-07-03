@@ -1,8 +1,8 @@
 <div class="row">
     <div class="col">
       <div class="p-2">
-        <span class="badge mr-2" style="background-color: rgb(33, 150, 243);">Midday</span>
-        <span class="badge" style="background-color: rgb(76, 175, 80);">Evening</span>
+        <span class="badge text-white mr-2" style="background-color: rgb(33, 150, 243);">Midday</span>
+        <span class="badge text-white" style="background-color: rgb(76, 175, 80);">Evening</span>
       </div>
         <app-calendar [events]="lottoEvents"></app-calendar>
     </div>
@@ -57,10 +57,20 @@
               </div>
             </ng-container>
             <div class="border rounded mt-3 px-3 pb-3 search-results-wrapper" *ngIf="lottoSearch.playType.value">
-              <h3 class="mb-0 py-2 theme-text search-results-title">Results</h3>
+              <div class="row search-results-title">
+                <div class="col-9">
+                  <h3 class="mb-0 py-2 theme-text">Results</h3>
+                </div>
+                <div class="col-3">
+                  <h3 class="mb-0 py-2 theme-text text-right">({{lottoSearchResults.length}})</h3>
+                </div>
+              </div>
             <ul class="mb-0 search-results">
               <li *ngFor="let event of lottoSearchResults" class="theme-text">
-                <span class="theme-text clickable" (click)="setCalendar(event)">{{event.startDate | date}} - {{event.title}}</span>
+                <span class="theme-text clickable" (click)="setCalendar(event)">
+                  <span class="badge" style="width: 18px; padding: .25em 0" [style.background-color]="event.meta?.midday ? 'rgb(33, 150, 243)' : 'rgb(76, 175, 80)'">{{event.meta?.midday ? 'M' : 'E'}}</span>
+                  {{event.startDate | date}} - {{event.title}} 
+                </span>
               </li>
             </ul>
             </div>
