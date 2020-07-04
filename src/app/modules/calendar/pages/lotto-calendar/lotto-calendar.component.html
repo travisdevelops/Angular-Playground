@@ -1,13 +1,15 @@
 <div class="row">
     <div class="col">
-      <div class="p-2">
-        <span class="badge text-white mr-2" style="background-color: rgb(33, 150, 243);">Midday</span>
-        <span class="badge text-white" style="background-color: rgb(76, 175, 80);">Evening</span>
-      </div>
+      <div class="pb-md-3 px-3 pr-md-0">
+        <div class="pt-2">
+          <span class="badge text-white mr-2" style="background-color: rgb(33, 150, 243);">Midday</span>
+          <span class="badge text-white" style="background-color: rgb(76, 175, 80);">Evening</span>
+        </div>
         <app-calendar [events]="lottoEvents"></app-calendar>
+      </div>
     </div>
-    <div class="col-4" *ngIf="lottoSearchGroup != null">
-      <div class="pr-3">
+    <div class="col-md-4" *ngIf="lottoSearchGroup != null">
+      <div class="pb-3 px-3 pl-md-0">
       <div class="mt-4 mb-3">
         <span class="btn btn-primary clickable mr-3" (click)="getLatest()">Get Latest</span>
         <span class="btn btn-danger clickable" (click)="getStatistics()">Get Statistics</span>
