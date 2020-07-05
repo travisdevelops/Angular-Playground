@@ -7,6 +7,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { HttpClientModule } from '@angular/common/http';
 import { LottoCalendarComponent } from './pages/lotto-calendar/lotto-calendar.component';
 import { LottoDataService } from './services/lotto-data.service';
+import { TTCommonModule } from '@tt/common';
 
 @NgModule({
   providers: [
@@ -21,7 +22,8 @@ import { LottoDataService } from './services/lotto-data.service';
     CalendarRoutingModule,
     ReactiveFormsModule,
     FontAwesomeModule,
-    HttpClientModule
+    HttpClientModule,
+    TTCommonModule
   ]
 })
 export class CalendarModule { }

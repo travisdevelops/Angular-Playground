@@ -4,7 +4,8 @@
     "baseUrl": "./src",
     "paths": {
       "@app/*": ["app/*"],
-      "@classes/*": ["app/classes/*"]
+      "@classes/*": ["app/classes/*"],
+      "@tt/common" : ["../../../Angular/TTLibraries/dist/@tt/common"]
     },
     "outDir": "./dist/out-tsc",
     "sourceMap": true,
