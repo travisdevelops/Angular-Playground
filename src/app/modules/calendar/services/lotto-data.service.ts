@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Calendar } from '../classes/calendar';
-import { CalendarEvent } from '../interfaces/calendar-event';
+import { TTCalendar, TTCalendarEvent } from '@tt/common';
 import ParsedLottoJSON from '../../../../assets/parsed-lotto.json';
 import { Vector } from '@app/classes/vector';
 import { takeUntil, tap, map, catchError } from 'rxjs/operators';
@@ -16,7 +15,7 @@ export class LottoDataService {
 
   constructor(private http: HttpClient) { }
 
-  getLottoEvents(): CalendarEvent[] {
+  getLottoEvents(): TTCalendarEvent[] {
     const calendarEvents = [];
     ParsedLottoJSON.forEach((data) => {
       if (data.date) {
@@ -28,7 +27,7 @@ export class LottoDataService {
             calendarEvents.push({
               title: p.value,
               color: p.color,
-              startDate: Calendar.stringToDate(data.date),
+              startDate: TTCalendar.stringToDate(data.date),
               meta: {
                 number: p.value,
                 midday: p.midday
@@ -51,10 +50,10 @@ export class LottoDataService {
         let parsedData = this.parseLottoEvents(val.data);
         const allValidDates = ParsedLottoJSON
         .filter((s) => !!s.date && !!s.numbersMidday && !!s.numbersEvening && !!s.win4Midday && !!s.win4Evening)
-        .map((s) => Calendar.stringToDate(s.date)).sort((a, b) => (b as any) - (a as any));
+        .map((s) => TTCalendar.stringToDate(s.date)).sort((a, b) => (b as any) - (a as any));
         const lastValidDate: Date = allValidDates.length > 0 ? allValidDates[0] : new Date();
 
-        parsedData = parsedData.filter((d) => Calendar.stringToDate(d.date) > lastValidDate);
+        parsedData = parsedData.filter((d) => TTCalendar.stringToDate(d.date) > lastValidDate);
         if (parsedData.length > 0) {
           this.getUpdatedLottoData(parsedData);
         } else {
@@ -65,7 +64,7 @@ export class LottoDataService {
 
     private parseLottoEvents(eventData: any[]) {
       return eventData.map((data) => {
-        const date = data[8] ? Calendar.dateToString(new Date(data[8])) : undefined;
+        const date = data[8] ? TTCalendar.dateToString(new Date(data[8])) : undefined;
         const numbersMidday = data[9] && data[9].toString().trim().length > 0 ? data[9].toString().trim() : undefined;
         const numbersEvening = data[11] && data[11].toString().trim().length > 0 ? data[11].toString().trim() : undefined;
         const win4Midday = data[13] && data[13].toString().trim().length > 0 ? data[13].toString().trim() : undefined;
@@ -77,7 +76,7 @@ export class LottoDataService {
 
   private getUpdatedLottoData(val: any[]) {
     const allData = this.removeDuplicates([...val, ...ParsedLottoJSON])
-    .sort((a, b) => (Calendar.stringToDate(b.date) as any) - (Calendar.stringToDate(a.date) as any))
+    .sort((a, b) => (TTCalendar.stringToDate(b.date) as any) - (TTCalendar.stringToDate(a.date) as any))
     .reverse();
     this.copyToClipBoard('Lotto Data', allData).subscribe((res) => {
       if (res) {
