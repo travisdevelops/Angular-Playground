@@ -1,9 +1,0 @@
-/* @include themes() { color: theme(buttonTextColor); } */
-@function theme($key) {
-  @return map-get($current-theme, $key);
-}
-
-/* background-color: color(darkgrey) */
-@function color($key) {
-  @return map-get($colors, $key);
-}

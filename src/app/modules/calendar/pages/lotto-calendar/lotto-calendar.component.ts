@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy, AfterViewInit } from '@angular/core';
 import { TTCalendarComponent, TTCalendarEvent } from '@tt/common';
 import { LottoDataService } from '../../services/lotto-data.service';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
@@ -12,13 +12,14 @@ import { LottoSearch } from '../../classes/lotto-search';
   templateUrl: './lotto-calendar.component.html',
   styleUrls: ['./lotto-calendar.component.scss']
 })
-export class LottoCalendarComponent implements OnInit, OnDestroy {
+export class LottoCalendarComponent implements OnInit, OnDestroy, AfterViewInit {
   year: FormControl;
   month: FormControl;
   lottoSearchGroup: FormGroup;
   lottoSearchResults: any[];
   statisticsLottoJSON = StatisticsLottoJSON;
   lottoEvents: TTCalendarEvent[] = [];
+  selectedEvent: TTCalendarEvent;
   @ViewChild(TTCalendarComponent, { static: true }) calendarComponent: TTCalendarComponent;
 
   get calendar() { return this.calendarComponent ? this.calendarComponent.calendar : null; }
@@ -38,6 +39,9 @@ export class LottoCalendarComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this._destroyed$.next();
     this._destroyed$.complete();
+  }
+
+  ngAfterViewInit() {
   }
 
   getLatest() {
@@ -96,7 +100,8 @@ export class LottoCalendarComponent implements OnInit, OnDestroy {
   }
 
   setCalendar(event: TTCalendarEvent) {
-    this.calendarComponent.setEventActive(event);
+    this.selectedEvent = event;
+    setTimeout(() => this.calendarComponent.setEventActive(event), 200);
   }
 
 }

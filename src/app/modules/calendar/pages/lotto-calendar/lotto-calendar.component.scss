@@ -4,6 +4,10 @@
     overflow-y: auto;
     display: block;
     height: calc(100% - 50px);
+
+    ul {
+        padding-left: 30px;
+    }
 }
 
 .search-results-wrapper {
@@ -17,4 +21,33 @@
             background-color: theme(backgroundColor);
           }
     }
+
+    .search-results {
+        li {
+            border: 1px solid transparent;
+            border-radius: 5px;
+            padding: 4px 6px;
+            line-height: 12px;
+            transition: margin 0.2s ease;
+
+            .midday-badge, .evening-badge {
+                width: 18px;
+                padding: 0.05em 0px 0.25em 0px;
+            }
+
+            &.selected-event {
+                border-color: #ffc107;
+                margin-left: 10px;
+            }
+        }
+    }
+}
+
+
+.midday-badge {
+    background-color: rgb(33, 150, 243);
+}
+
+.evening-badge {
+    background-color: rgb(76, 175, 80);
 }

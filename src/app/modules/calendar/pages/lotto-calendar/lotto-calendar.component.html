@@ -3,14 +3,14 @@
     <div class="col">
       <div class="pb-md-3">
         <div class="pt-2">
-          <span class="badge text-white mr-2" style="background-color: rgb(33, 150, 243);">Midday</span>
-          <span class="badge text-white" style="background-color: rgb(76, 175, 80);">Evening</span>
+          <span class="badge text-white mr-2 midday-badge">Midday</span>
+          <span class="badge text-white evening-badge">Evening</span>
         </div>
         <tt-calendar [events]="lottoEvents"></tt-calendar>
       </div>
     </div>
     <div class="col-lg-4" *ngIf="lottoSearchGroup != null">
-      <div class="pb-3">
+      <div class="pb-4">
       <div class="d-lg-block d-none mb-3 mt-4">
         <span class="btn btn-primary clickable mr-3" (click)="getLatest()">Get Latest</span>
         <span class="btn btn-danger clickable" (click)="getStatistics()">Get Statistics</span>
@@ -28,7 +28,7 @@
             </form>
             <ng-container *ngIf="!lottoSearch.playType.value">
               <h3 class="mt-4 theme-text">Top Numbers</h3>
-              <div class="row">
+              <div class="row mb-4">
                 <div class="col-6">
                   <h6 class="theme-text">Numbers (Midday)</h6>
                   <ul>
@@ -68,10 +68,10 @@
                   <h3 class="mb-0 py-2 theme-text text-right">({{lottoSearchResults.length}})</h3>
                 </div>
               </div>
-            <ul class="mb-0 search-results">
-              <li *ngFor="let event of lottoSearchResults" class="theme-text">
+            <ul class="mb-0 search-results pt-1">
+              <li *ngFor="let event of lottoSearchResults" class="theme-text pb-1" [class.selected-event]="event === selectedEvent">
                 <span class="theme-text clickable" (click)="setCalendar(event)">
-                  <span class="badge" style="width: 18px; padding: .25em 0" [style.background-color]="event.meta?.midday ? 'rgb(33, 150, 243)' : 'rgb(76, 175, 80)'">{{event.meta?.midday ? 'M' : 'E'}}</span>
+                  <span class="badge" [class.midday-badge]="event.meta?.midday" [class.evening-badge]="!event.meta?.midday">{{event.meta?.midday ? 'M' : 'E'}}</span>
                   {{event.startDate | date}} - {{event.title}} 
                 </span>
               </li>
