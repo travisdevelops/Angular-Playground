@@ -1,13 +1,11 @@
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
-import { CalendarComponent } from '../../components/calendar/calendar.component';
+import { TTCalendarComponent, TTCalendarEvent } from '@tt/common';
 import { LottoDataService } from '../../services/lotto-data.service';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Calendar } from '../../classes/calendar';
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { Subject } from 'rxjs';
-import { tap, debounceTime, distinctUntilChanged, takeUntil, filter } from 'rxjs/operators';
+import { tap, distinctUntilChanged, takeUntil, filter } from 'rxjs/operators';
 import StatisticsLottoJSON from '../../../../../assets/statistics-lotto.json';
 import { LottoSearch } from '../../classes/lotto-search';
-import { CalendarEvent } from '../../interfaces/calendar-event';
 
 @Component({
   selector: 'app-lotto-calendar',
@@ -15,14 +13,13 @@ import { CalendarEvent } from '../../interfaces/calendar-event';
   styleUrls: ['./lotto-calendar.component.scss']
 })
 export class LottoCalendarComponent implements OnInit, OnDestroy {
-  Calendar: any = Calendar;
   year: FormControl;
   month: FormControl;
   lottoSearchGroup: FormGroup;
   lottoSearchResults: any[];
   statisticsLottoJSON = StatisticsLottoJSON;
-  lottoEvents: CalendarEvent[] = [];
-  @ViewChild(CalendarComponent, { static: true }) calendarComponent: CalendarComponent;
+  lottoEvents: TTCalendarEvent[] = [];
+  @ViewChild(TTCalendarComponent, { static: true }) calendarComponent: TTCalendarComponent;
 
   get calendar() { return this.calendarComponent ? this.calendarComponent.calendar : null; }
 
@@ -98,7 +95,7 @@ export class LottoCalendarComponent implements OnInit, OnDestroy {
     this.lottoSearch.playType.setValue(2);
   }
 
-  setCalendar(event: CalendarEvent) {
+  setCalendar(event: TTCalendarEvent) {
     this.calendarComponent.setEventActive(event);
   }
 

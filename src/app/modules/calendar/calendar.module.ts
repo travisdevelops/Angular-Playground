@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CalendarRoutingModule } from './calendar-routing.module';
-import { CalendarComponent } from './components/calendar/calendar.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { HttpClientModule } from '@angular/common/http';
@@ -14,7 +13,6 @@ import { TTCommonModule } from '@tt/common';
     LottoDataService
   ],
   declarations: [
-    CalendarComponent,
     LottoCalendarComponent
     ],
   imports: [

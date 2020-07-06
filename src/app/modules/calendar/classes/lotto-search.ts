@@ -1,8 +1,8 @@
-import { Calendar } from './calendar';
+import { TTCalendar } from '@tt/common';
 
 export class LottoSearch {
 
-  static searchBox(calendar: Calendar, searchValue: string): any[] {
+  static searchBox(calendar: TTCalendar, searchValue: string): any[] {
     let eventSearchResults = [];
     if (searchValue && (searchValue.length === 3 || searchValue.length === 4) && !isNaN(searchValue as any)) {
       const matchingKeyValues = {};
@@ -24,7 +24,7 @@ export class LottoSearch {
     return eventSearchResults;
   }
 
-  static searchStraight(calendar: Calendar, searchValue: string): any[] {
+  static searchStraight(calendar: TTCalendar, searchValue: string): any[] {
     let eventSearchResults = [];
     if (searchValue && (searchValue.length === 3 || searchValue.length === 4) && !isNaN(searchValue as any)) {
       eventSearchResults = calendar.events
