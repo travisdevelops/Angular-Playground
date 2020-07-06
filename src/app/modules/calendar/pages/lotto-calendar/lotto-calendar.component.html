@@ -68,14 +68,13 @@
                   <h3 class="mb-0 py-2 theme-text text-right">({{lottoSearchResults.length}})</h3>
                 </div>
               </div>
-            <ul class="mb-0 search-results pt-1">
-              <li *ngFor="let event of lottoSearchResults" class="theme-text pb-1" [class.selected-event]="event === selectedEvent">
-                <span class="theme-text clickable" (click)="setCalendar(event)">
-                  <span class="badge" [class.midday-badge]="event.meta?.midday" [class.evening-badge]="!event.meta?.midday">{{event.meta?.midday ? 'M' : 'E'}}</span>
-                  {{event.startDate | date}} - {{event.title}} 
+            <ol class="mb-0 search-results pt-1">
+              <li *ngFor="let event of lottoSearchResults" class="theme-text clickable" (click)="setCalendar(event)" [class.selected-event]="event === selectedEvent">
+                <span class="theme-text">
+                  <span class="badge" [class.midday-badge]="event.meta?.midday" [class.evening-badge]="!event.meta?.midday">{{event.meta?.midday ? 'M' : 'E'}}</span>{{event.startDate | date}} - {{event.title}} 
                 </span>
               </li>
-            </ul>
+            </ol>
             </div>
       </ng-container>
       </div>
