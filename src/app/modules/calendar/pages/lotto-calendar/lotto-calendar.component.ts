@@ -6,6 +6,7 @@ import { Subject } from 'rxjs';
 import { tap, distinctUntilChanged, takeUntil, filter } from 'rxjs/operators';
 import StatisticsLottoJSON from '../../../../../assets/statistics-lotto.json';
 import { LottoSearch } from '../../classes/lotto-search';
+import { environment } from 'environments/environment';
 
 @Component({
   selector: 'app-lotto-calendar',
@@ -21,6 +22,7 @@ export class LottoCalendarComponent implements OnInit, OnDestroy, AfterViewInit 
   lottoEvents: TTCalendarEvent[] = [];
   selectedEvent: TTCalendarEvent;
   @ViewChild(TTCalendarComponent, { static: true }) calendarComponent: TTCalendarComponent;
+  protected env: any = environment;
 
   get calendar() { return this.calendarComponent ? this.calendarComponent.calendar : null; }
 
