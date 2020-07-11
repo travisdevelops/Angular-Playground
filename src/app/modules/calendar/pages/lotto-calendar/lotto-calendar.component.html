@@ -11,72 +11,157 @@
     </div>
     <div class="col-lg-4" *ngIf="lottoSearchGroup != null">
       <div class="pb-4">
-      <div class="mb-3 mt-4" *ngIf="!env.production">
-        <span class="btn btn-primary clickable mr-3" (click)="getLatest()">Get Latest</span>
-        <span class="btn btn-danger clickable" (click)="getStatistics()">Get Statistics</span>
-      </div>
-      <ng-container *ngIf="!showAdd">
-      <form [formGroup]="lottoSearchGroup">
-        <div class="form-group">
-          <label class="theme-text">Number</label>
-          <input class="form-control" formControlName="number" />
+        <div class="mb-3 mt-4" *ngIf="!env.production">
+          <p class="theme-text">Dev Menu</p>
+          <div class="btn-group w-100" role="group">
+            <button type="button" class="btn btn-primary clickable" (click)="getLatest()">Get Latest</button>
+            <button type="button" class="btn btn-success clickable" (click)="getStatistics()">Get Statistics</button>
+            <button type="button" class="btn btn-info clickable" (click)="getDigitStatistics()">Get Digit
+              Statistics</button>
+          </div>
         </div>
-              <div class="btn-group w-100" role="group">
-                <button type="button" class="btn" [ngClass]="{'theme-button-outline' : lottoSearch.playType.value !== 1, 'theme-button' : lottoSearch.playType.value === 1}" (click)="searchBox()">Box</button>
-                <button type="button" class="btn" [ngClass]="{'theme-button-outline' : lottoSearch.playType.value !== 2, 'theme-button' : lottoSearch.playType.value === 2}" (click)="searchStraight()">Straight</button>
+        <div class="mb-3 mt-4">
+          <p class="theme-text">User Menu</p>
+          <div class="btn-group w-100" role="group">
+            <button type="button" class="btn clickable" (click)="getPredictions(1)"
+              [class.btn-success]="resultsDisplay === ResultsDisplayEnum.PredictionResults && predictionType === 1"
+              [class.btn-outline-success]="resultsDisplay !== ResultsDisplayEnum.PredictionResults || predictionType !== 1">Predict
+              Numbers</button>
+              <button type="button" class="btn clickable" (click)="getPredictions(2)"
+                [class.btn-primary]="resultsDisplay === ResultsDisplayEnum.PredictionResults && predictionType === 2"
+                [class.btn-outline-primary]="resultsDisplay !== ResultsDisplayEnum.PredictionResults || predictionType !== 2">Straight
+                Predictions</button>
+                <button type="button" class="btn clickable" (click)="getPredictions(3)"
+                  [class.btn-danger]="resultsDisplay === ResultsDisplayEnum.PredictionResults && predictionType === 3"
+                  [class.btn-outline-danger]="resultsDisplay !== ResultsDisplayEnum.PredictionResults || predictionType !== 3">Box 
+                  Predictions</button>
+            <button type="button" class="btn clickable" (click)="topResults()"
+              [class.btn-info]="resultsDisplay === ResultsDisplayEnum.TopResults"
+              [class.btn-outline-info]="resultsDisplay !== ResultsDisplayEnum.TopResults">Top Numbers</button>
+          </div>
+        </div>
+        <ng-container *ngIf="!showAdd">
+          <form [formGroup]="lottoSearchGroup">
+            <div class="form-group">
+              <label class="theme-text">Search</label>
+              <input class="form-control" formControlName="number" />
+            </div>
+            <div class="btn-group w-100" role="group">
+              <button type="button" class="btn"
+                [ngClass]="{'theme-button-outline' : lottoSearch.playType.value !== 1, 'theme-button' : lottoSearch.playType.value === 1}"
+                (click)="searchBox()">Box</button>
+              <button type="button" class="btn"
+                [ngClass]="{'theme-button-outline' : lottoSearch.playType.value !== 2, 'theme-button' : lottoSearch.playType.value === 2}"
+                (click)="searchStraight()">Straight</button>
+            </div>
+          </form>
+          <ng-container [ngSwitch]="resultsDisplay">
+            <ng-container *ngSwitchCase="ResultsDisplayEnum.PredictionResults">
+              <h3 class="mt-4 theme-text">
+                <ng-container *ngIf="predictionType === 1">Normal </ng-container>
+                <ng-container *ngIf="predictionType === 2">Straight </ng-container>
+                <ng-container *ngIf="predictionType === 3">Box </ng-container>
+                Predictions</h3>
+              <div class="row mb-4">
+                <div class="col-6">
+                  <h6 class="theme-text">Numbers (Midday)</h6>
+                  <ul class="search-results">
+                    <li *ngFor="let result of predictionResults.numbersMidday | slice:0:5" class="theme-text clickable" (click)="setNumber(result)"
+                    [class.selected-event]="result === selectedNumber">
+                      <span class="theme-text">{{result}}</span>
+                    </li>
+                  </ul>
+                  <h6 class="theme-text">Numbers (Evening)</h6>
+                  <ul class="search-results">
+                    <li *ngFor="let result of predictionResults.numbersEvening | slice:0:5" class="theme-text clickable" (click)="setNumber(result)"
+                    [class.selected-event]="result === selectedNumber">
+                      <span class="theme-text">{{result}}</span>
+                    </li>
+                  </ul>
+                </div>
+                <div class="col-6">
+                  <h6 class="theme-text">Win4 (Midday)</h6>
+                  <ul class="search-results">
+                    <li *ngFor="let result of predictionResults.win4Midday | slice:0:5" class="theme-text clickable" (click)="setNumber(result)"
+                    [class.selected-event]="result === selectedNumber">
+                      <span class="theme-text">{{result}}</span>
+                    </li>
+                  </ul>
+                  <h6 class="theme-text">Win4 (Evening)</h6>
+                  <ul class="search-results">
+                    <li *ngFor="let result of predictionResults.win4Evening | slice:0:5" class="theme-text clickable" (click)="setNumber(result)"
+                    [class.selected-event]="result === selectedNumber">
+                      <span class="theme-text">{{result}}</span>
+                    </li>
+                  </ul>
+                </div>
               </div>
-            </form>
-            <ng-container *ngIf="!lottoSearch.playType.value">
+            </ng-container>
+            <ng-container *ngSwitchCase=" ResultsDisplayEnum.TopResults">
               <h3 class="mt-4 theme-text">Top Numbers</h3>
               <div class="row mb-4">
                 <div class="col-6">
                   <h6 class="theme-text">Numbers (Midday)</h6>
-                  <ul>
-                    <li *ngFor="let result of statisticsLottoJSON.numbersMidday | slice:0:5" class="theme-text">
+                  <ul class="search-results">
+                    <li *ngFor="let result of statisticsLottoJSON.numbersMidday | slice:0:5" class="theme-text clickable" (click)="setNumber(result.number)"
+                    [class.selected-event]="result.number === selectedNumber">
                       <span class="theme-text">{{result.number + ' - Count ' + result.count}}</span>
                     </li>
                   </ul>
                   <h6 class="theme-text">Numbers (Evening)</h6>
-                  <ul>
-                    <li *ngFor="let result of statisticsLottoJSON.numbersEvening | slice:0:5" class="theme-text">
+                  <ul class="search-results">
+                    <li *ngFor="let result of statisticsLottoJSON.numbersEvening | slice:0:5" class="theme-text clickable" (click)="setNumber(result.number)"
+                    [class.selected-event]="result.number === selectedNumber">
                       <span class="theme-text">{{result.number + ' - Count ' + result.count}}</span>
                     </li>
                   </ul>
                 </div>
                 <div class="col-6">
                   <h6 class="theme-text">Win4 (Midday)</h6>
-                  <ul>
-                    <li *ngFor="let result of statisticsLottoJSON.win4Midday | slice:0:5" class="theme-text">
+                  <ul class="search-results">
+                    <li *ngFor="let result of statisticsLottoJSON.win4Midday | slice:0:5" class="theme-text clickable" (click)="setNumber(result.number)"
+                    [class.selected-event]="result.number === selectedNumber">
                       <span class="theme-text">{{result.number + ' - Count ' + result.count}}</span>
                     </li>
                   </ul>
                   <h6 class="theme-text">Win4 (Evening)</h6>
-                  <ul>
-                    <li *ngFor="let result of statisticsLottoJSON.win4Evening | slice:0:5" class="theme-text">
+                  <ul class="search-results">
+                    <li *ngFor="let result of statisticsLottoJSON.win4Evening | slice:0:5" class="theme-text clickable" (click)="setNumber(result.number)"
+                    [class.selected-event]="result.number === selectedNumber">
                       <span class="theme-text">{{result.number + ' - Count ' + result.count}}</span>
                     </li>
                   </ul>
                 </div>
               </div>
             </ng-container>
-            <div class="border rounded mt-3 px-3 pb-3 search-results-wrapper" *ngIf="lottoSearch.playType.value">
-              <div class="row search-results-title">
-                <div class="col-9">
-                  <h3 class="mb-0 py-2 theme-text">Results</h3>
+            <ng-container *ngSwitchCase=" ResultsDisplayEnum.SearchResults">
+              <div class="border rounded mt-3 px-3 pb-3 search-results-wrapper">
+                <div class="row search-results-title">
+                  <div class="col-9">
+                    <h3 class="mb-0 py-2 theme-text">
+                      <ng-container *ngIf="lottoSearch.playType.value === 1">Box</ng-container>
+                      <ng-container *ngIf="lottoSearch.playType.value === 2">Straight</ng-container>
+                      Results
+                    </h3>
+                  </div>
+                  <div class="col-3">
+                    <h3 class="mb-0 py-2 theme-text text-right">({{lottoSearchResults.length}})</h3>
+                  </div>
                 </div>
-                <div class="col-3">
-                  <h3 class="mb-0 py-2 theme-text text-right">({{lottoSearchResults.length}})</h3>
-                </div>
+                <ol class="mb-0 search-results pt-1">
+                  <li *ngFor="let event of lottoSearchResults" class="theme-text clickable" (click)="setCalendar(event)"
+                    [class.selected-event]="event === selectedEvent">
+                    <span class="theme-text">
+                      <span class="badge" [class.midday-badge]="event.meta?.midday"
+                        [class.evening-badge]="!event.meta?.midday">{{event.meta?.midday ? 'M' : 'E'}}</span>{{event.startDate | date}}
+                      - {{event.title}}
+                    </span>
+                  </li>
+                </ol>
               </div>
-            <ol class="mb-0 search-results pt-1">
-              <li *ngFor="let event of lottoSearchResults" class="theme-text clickable" (click)="setCalendar(event)" [class.selected-event]="event === selectedEvent">
-                <span class="theme-text">
-                  <span class="badge" [class.midday-badge]="event.meta?.midday" [class.evening-badge]="!event.meta?.midday">{{event.meta?.midday ? 'M' : 'E'}}</span>{{event.startDate | date}} - {{event.title}} 
-                </span>
-              </li>
-            </ol>
-            </div>
-      </ng-container>
+            </ng-container>
+          </ng-container>
+        </ng-container>
       </div>
     </div>
   </div>

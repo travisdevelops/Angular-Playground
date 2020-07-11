@@ -1,1 +1,1 @@
-
+export * from './lotto-statistics';

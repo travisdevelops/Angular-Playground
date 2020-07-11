@@ -8,12 +8,19 @@ import StatisticsLottoJSON from '../../../../../assets/statistics-lotto.json';
 import { LottoSearch } from '../../classes/lotto-search';
 import { environment } from 'environments/environment';
 
+enum ResultsDisplayEnum {
+  TopResults = 1,
+  SearchResults = 2,
+  PredictionResults = 3
+}
+
 @Component({
   selector: 'app-lotto-calendar',
   templateUrl: './lotto-calendar.component.html',
   styleUrls: ['./lotto-calendar.component.scss']
 })
 export class LottoCalendarComponent implements OnInit, OnDestroy, AfterViewInit {
+  @ViewChild(TTCalendarComponent, { static: true }) calendarComponent: TTCalendarComponent;
   year: FormControl;
   month: FormControl;
   lottoSearchGroup: FormGroup;
@@ -21,7 +28,11 @@ export class LottoCalendarComponent implements OnInit, OnDestroy, AfterViewInit 
   statisticsLottoJSON = StatisticsLottoJSON;
   lottoEvents: TTCalendarEvent[] = [];
   selectedEvent: TTCalendarEvent;
-  @ViewChild(TTCalendarComponent, { static: true }) calendarComponent: TTCalendarComponent;
+  selectedNumber: string;
+  ResultsDisplayEnum = ResultsDisplayEnum;
+  resultsDisplay = ResultsDisplayEnum.TopResults;
+  predictionResults = {};
+  predictionType: number;
   protected env: any = environment;
 
   get calendar() { return this.calendarComponent ? this.calendarComponent.calendar : null; }
@@ -54,6 +65,10 @@ export class LottoCalendarComponent implements OnInit, OnDestroy, AfterViewInit 
     this.lottoData.getLottoStatistics();
   }
 
+  getDigitStatistics() {
+    this.lottoData.getLottoDigitStatistics();
+  }
+
   createForms() {
     this.lottoSearchGroup = this.fb.group({
       number: this.fb.control(null),
@@ -67,6 +82,7 @@ export class LottoCalendarComponent implements OnInit, OnDestroy, AfterViewInit 
         if (this.lottoSearch.playType.value) {
           this.lottoSearch.playType.setValue(null);
           this.lottoSearchResults = [];
+          this.resultsDisplay = ResultsDisplayEnum.TopResults;
         }
       }),
       takeUntil(this._destroyed$)
@@ -85,8 +101,10 @@ export class LottoCalendarComponent implements OnInit, OnDestroy, AfterViewInit 
             this.lottoSearchResults = LottoSearch.searchStraight(this.calendar, this.lottoSearch.number.value);
           break;
         }
-        if (this.lottoSearchResults.length === 0) {
-          this.lottoSearch.playType.setValue(null);
+        if (this.lottoSearch.number.value && (this.lottoSearch.number.value.length === 3 || this.lottoSearch.number.value.length === 4)) {
+          this.resultsDisplay = ResultsDisplayEnum.SearchResults;
+        } else {
+          this.lottoSearch.playType.reset();
         }
       }),
       takeUntil(this._destroyed$)
@@ -104,6 +122,23 @@ export class LottoCalendarComponent implements OnInit, OnDestroy, AfterViewInit 
   setCalendar(event: TTCalendarEvent) {
     this.selectedEvent = event;
     setTimeout(() => this.calendarComponent.setEventActive(event), 200);
+  }
+
+  getPredictions(predictionType: number) {
+    this.lottoSearch.playType.reset();
+    this.resultsDisplay = ResultsDisplayEnum.PredictionResults;
+    this.predictionType = predictionType;
+    this.predictionResults = this.lottoData.getPredictions(predictionType);
+  }
+
+  topResults() {
+    this.lottoSearch.playType.reset();
+    this.resultsDisplay = ResultsDisplayEnum.TopResults;
+  }
+
+  setNumber(number: string) {
+    this.selectedNumber = number;
+    this.lottoSearch.number.setValue(number);
   }
 
 }
