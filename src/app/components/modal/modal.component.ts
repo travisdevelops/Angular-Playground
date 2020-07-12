@@ -26,7 +26,6 @@ export class ModalComponent implements OnInit {
     this.modalTemplate.createComponent(factory);
     $(this.modalContainer.nativeElement).modal();
     $(this.modalContainer.nativeElement).on('hidden.bs.modal', (e) => {
-      console.log(this.componentRef);
       this.componentRef.destroy();
     });
   }

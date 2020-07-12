@@ -256,9 +256,10 @@ export class LottoDataService {
           num = getValidIndex(array[3], num);
         }
         if (predictionType === 3) {
-          num = shuffle(num);
-          num = shuffle(num);
-          num = shuffle(num);
+          const shuffleTimes = Helper.randomNumber(2, 7);
+          for (let i = 0; i < shuffleTimes; i++) {
+            num = shuffle(num);
+          }
         }
         return numbers.find((n) => n === num) == null ? num : genUniqueNumbers(array, win4, numbers);
       };

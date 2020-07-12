@@ -6,7 +6,7 @@
     height: calc(100% - 50px);
 
     ul {
-        padding-left: 30px;
+        padding-left: 20px;
     }
 }
 
@@ -27,6 +27,7 @@
 
 .search-results {
     padding-left: 20px;
+    white-space: nowrap;
     
     li {
         border: 1px solid transparent;
@@ -56,4 +57,14 @@
 
 .evening-badge {
     background-color: rgb(76, 175, 80);
+}
+
+
+@media (max-width: 575px) {
+    #UserMenu {
+        button {
+            font-size: 13px;
+            padding: 5px 0;
+        }
+    }
 }

@@ -31,6 +31,7 @@ export class LottoCalendarComponent implements OnInit, OnDestroy, AfterViewInit 
   selectedNumber: string;
   ResultsDisplayEnum = ResultsDisplayEnum;
   resultsDisplay = ResultsDisplayEnum.TopResults;
+  allPredictionResults = {};
   predictionResults = {};
   predictionType: number;
   protected env: any = environment;
@@ -128,7 +129,10 @@ export class LottoCalendarComponent implements OnInit, OnDestroy, AfterViewInit 
     this.lottoSearch.playType.reset();
     this.resultsDisplay = ResultsDisplayEnum.PredictionResults;
     this.predictionType = predictionType;
-    this.predictionResults = this.lottoData.getPredictions(predictionType);
+    if (!this.allPredictionResults[predictionType]) {
+      this.allPredictionResults[predictionType] = this.lottoData.getPredictions(predictionType);
+    } 
+    this.predictionResults = this.allPredictionResults[predictionType];
   }
 
   topResults() {
@@ -139,6 +143,11 @@ export class LottoCalendarComponent implements OnInit, OnDestroy, AfterViewInit 
   setNumber(number: string) {
     this.selectedNumber = number;
     this.lottoSearch.number.setValue(number);
+  }
+
+  refreshPredictions() {
+    this.allPredictionResults[this.predictionType] = this.lottoData.getPredictions(this.predictionType);
+    this.predictionResults = this.allPredictionResults[this.predictionType];
   }
 
 }
