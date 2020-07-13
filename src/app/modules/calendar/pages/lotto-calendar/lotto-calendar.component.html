@@ -63,7 +63,7 @@
                   <ng-container *ngIf="predictionType === 2">Straight </ng-container>
                   <ng-container *ngIf="predictionType === 3">Box </ng-container>
                   Predictions</h3>
-                  <span class="btn theme-button-outline float-right" (click)="refreshPredictions()" *ngIf="predictionType !== 1">
+                  <span class="btn theme-button-outline float-right clickable" (click)="refreshPredictions()" *ngIf="predictionType !== 1">
                     <fa-icon icon="sync-alt"></fa-icon>
                   </span>
               </div>
