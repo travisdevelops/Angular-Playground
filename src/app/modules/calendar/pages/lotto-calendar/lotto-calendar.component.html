@@ -102,7 +102,7 @@
                 </div>
               </div>
             </ng-container>
-            <ng-container *ngSwitchCase=" ResultsDisplayEnum.TopResults">
+            <ng-container *ngSwitchCase="ResultsDisplayEnum.TopResults">
               <h3 class="mt-4 mb-3 theme-text">Top Numbers</h3>
               <div class="row mb-4">
                 <div class="col-6">
@@ -110,14 +110,14 @@
                   <ul class="search-results">
                     <li *ngFor="let result of statisticsLottoJSON.numbersMidday | slice:0:5" class="theme-text clickable" (click)="setNumber(result.number)"
                     [class.selected-event]="result.number === selectedNumber">
-                      <span class="theme-text">{{result.number + ' - Count ' + result.count}}</span>
+                      <span class="theme-text">{{result.number}} - {{result.count}}x ({{ result.count / statisticsLottoJSON.totalNumbersMidday | percent:'1.2-2'}})</span>
                     </li>
                   </ul>
                   <h6 class="theme-text nowrap">Numbers (Evening)</h6>
                   <ul class="search-results">
                     <li *ngFor="let result of statisticsLottoJSON.numbersEvening | slice:0:5" class="theme-text clickable" (click)="setNumber(result.number)"
                     [class.selected-event]="result.number === selectedNumber">
-                      <span class="theme-text">{{result.number + ' - Count ' + result.count}}</span>
+                      <span class="theme-text">{{result.number}} - {{result.count}}x ({{ result.count / statisticsLottoJSON.totalNumbersEvening | percent:'1.2-2'}})</span>
                     </li>
                   </ul>
                 </div>
@@ -126,14 +126,14 @@
                   <ul class="search-results">
                     <li *ngFor="let result of statisticsLottoJSON.win4Midday | slice:0:5" class="theme-text clickable" (click)="setNumber(result.number)"
                     [class.selected-event]="result.number === selectedNumber">
-                      <span class="theme-text">{{result.number + ' - Count ' + result.count}}</span>
+                      <span class="theme-text">{{result.number}} - {{result.count}}x ({{ result.count / statisticsLottoJSON.totalWin4Midday | percent:'1.2-2'}})</span>
                     </li>
                   </ul>
                   <h6 class="theme-text nowrap">Win4 (Evening)</h6>
                   <ul class="search-results">
                     <li *ngFor="let result of statisticsLottoJSON.win4Evening | slice:0:5" class="theme-text clickable" (click)="setNumber(result.number)"
                     [class.selected-event]="result.number === selectedNumber">
-                      <span class="theme-text">{{result.number + ' - Count ' + result.count}}</span>
+                      <span class="theme-text">{{result.number}} - {{result.count}}x ({{ result.count / statisticsLottoJSON.totalWin4Evening | percent:'1.2-2'}})</span>
                     </li>
                   </ul>
                 </div>

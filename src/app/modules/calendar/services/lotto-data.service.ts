@@ -102,7 +102,11 @@ export class LottoDataService {
       numbersMidday: [],
       numbersEvening: [],
       win4Midday: [],
-      win4Evening: []
+      win4Evening: [],
+      totalNumbersMidday: 0,
+      totalNumbersEvening: 0,
+      totalWin4Midday: 0,
+      totalWin4Evening: 0
     };
 
     const findNumber = (array, num) => array.find((h) => LottoSearch.isEqualBox(h.number, num));
@@ -126,6 +130,11 @@ export class LottoDataService {
     obj.numbersEvening.sort((a, b) => b.count - a.count);
     obj.win4Midday.sort((a, b) => b.count - a.count);
     obj.win4Evening.sort((a, b) => b.count - a.count);
+
+    obj.totalNumbersMidday = (obj.numbersMidday as any).reduce((a, b) => a + b.count, 0);
+    obj.totalNumbersEvening = (obj.numbersEvening as any).reduce((a, b) => a + b.count, 0);
+    obj.totalWin4Midday = (obj.win4Midday as any).reduce((a, b) => a + b.count, 0);
+    obj.totalWin4Evening = (obj.win4Evening as any).reduce((a, b) => a + b.count, 0);
 
     this.copyToClipBoard('Lotto Statistics', obj).subscribe((res) => {
       if (res) {

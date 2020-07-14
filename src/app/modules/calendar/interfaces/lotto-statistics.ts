@@ -10,6 +10,10 @@ export interface LottoStatistics {
     numbersEvening: LottoStatistic[];
     win4Midday: LottoStatistic[];
     win4Evening: LottoStatistic[];
+    totalNumbersMidday?: number;
+    totalNumbersEvening?: number;
+    totalWin4Midday?: number;
+    totalWin4Evening?: number;
 }
 
 interface LottoStatistic {
