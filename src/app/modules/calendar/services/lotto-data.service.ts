@@ -5,7 +5,6 @@ import StatisticsDigitLottoJSON from '../../../../assets/statistics-digit-lotto.
 import { Vector } from '@app/classes/vector';
 import { takeUntil, tap, map, catchError } from 'rxjs/operators';
 import { Subject, Observable, from, of } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
 import { LottoSearch } from '../classes';
 import { LottoStatistics, LottoDigitStatistics } from '../interfaces';
 import { Helper } from '@classes/helper';
@@ -16,7 +15,7 @@ import { Helper } from '@classes/helper';
 export class LottoDataService {
   private loading$: Subject<boolean> = new Subject();
 
-  constructor(private http: HttpClient) { }
+  constructor() { }
 
   getLottoEvents(): TTCalendarEvent[] {
     const calendarEvents = [];
@@ -43,149 +42,6 @@ export class LottoDataService {
       }
     });
     return calendarEvents;
-  }
-
-  getLatestLottoData() {
-      this.loading$.next(true);
-      this.http.get('https://data.ny.gov/api/views/hsys-3def/rows.json?accessType=DOWNLOAD&sorting=true').pipe(
-        takeUntil(this.loading$)
-      ).subscribe((val: any) => {
-        let parsedData = this.parseLottoEvents(val.data);
-        const allValidDates = ParsedLottoJSON
-        .filter((s) => !!s.date && !!s.numbersMidday && !!s.numbersEvening && !!s.win4Midday && !!s.win4Evening)
-        .map((s) => TTCalendar.stringToDate(s.date)).sort((a, b) => (b as any) - (a as any));
-        const lastValidDate: Date = allValidDates.length > 0 ? allValidDates[0] : new Date();
-
-        parsedData = parsedData.filter((d) => TTCalendar.stringToDate(d.date) > lastValidDate);
-        if (parsedData.length > 0) {
-          this.getUpdatedLottoData(parsedData);
-        } else {
-          console.log('Up to Date');
-        }
-      });
-    }
-
-    private parseLottoEvents(eventData: any[]) {
-      return eventData.map((data) => {
-        const date = data[8] ? TTCalendar.dateToString(new Date(data[8])) : undefined;
-        const numbersMidday = data[9] && data[9].toString().trim().length > 0 ? data[9].toString().trim() : undefined;
-        const numbersEvening = data[11] && data[11].toString().trim().length > 0 ? data[11].toString().trim() : undefined;
-        const win4Midday = data[13] && data[13].toString().trim().length > 0 ? data[13].toString().trim() : undefined;
-        const win4Evening = data[15] && data[15].toString().trim().length > 0 ? data[15].toString().trim() : undefined;
-        return { date, numbersMidday, numbersEvening, win4Midday, win4Evening};
-      });
-    }
-
-
-  private getUpdatedLottoData(val: any[]) {
-    const allData = this.removeDuplicates([...val, ...ParsedLottoJSON])
-    .sort((a, b) => (TTCalendar.stringToDate(b.date) as any) - (TTCalendar.stringToDate(a.date) as any))
-    .reverse();
-    this.copyToClipBoard('Lotto Data', allData).subscribe((res) => {
-      if (res) {
-        this.getLottoStatistics(allData);
-      }
-    });
-  }
-
-  private copyToClipBoard(message: string, data: any): Observable<boolean> {
-    confirm('Attempting to Copy to Clipboard: ' + message);
-    return from(navigator.clipboard.writeText(JSON.stringify(data))).pipe(
-      tap(() => alert('Copied to Clipboard: ' + message)),
-      map(() => true),
-      catchError((err) => of(false))
-    );
-  }
-
-  getLottoStatistics(newData: any[] = ParsedLottoJSON) {
-    const obj: LottoStatistics = {
-      numbersMidday: [],
-      numbersEvening: [],
-      win4Midday: [],
-      win4Evening: [],
-      totalNumbersMidday: 0,
-      totalNumbersEvening: 0,
-      totalWin4Midday: 0,
-      totalWin4Evening: 0
-    };
-
-    const findNumber = (array, num) => array.find((h) => LottoSearch.isEqualBox(h.number, num));
-    const setData = (s, objArray) => {
-      if (s != null) {
-        const found = findNumber(objArray, s);
-        if (found) {
-          found.count++;
-        } else {
-          objArray.push({ number: s, count: 1 });
-        }
-      }
-    };
-    newData.forEach((s) => {
-      setData(s.numbersMidday, obj.numbersMidday);
-      setData(s.numbersEvening, obj.numbersEvening);
-      setData(s.win4Midday, obj.win4Midday);
-      setData(s.win4Evening, obj.win4Evening);
-    });
-    obj.numbersMidday.sort((a, b) => b.count - a.count);
-    obj.numbersEvening.sort((a, b) => b.count - a.count);
-    obj.win4Midday.sort((a, b) => b.count - a.count);
-    obj.win4Evening.sort((a, b) => b.count - a.count);
-
-    obj.totalNumbersMidday = (obj.numbersMidday as any).reduce((a, b) => a + b.count, 0);
-    obj.totalNumbersEvening = (obj.numbersEvening as any).reduce((a, b) => a + b.count, 0);
-    obj.totalWin4Midday = (obj.win4Midday as any).reduce((a, b) => a + b.count, 0);
-    obj.totalWin4Evening = (obj.win4Evening as any).reduce((a, b) => a + b.count, 0);
-
-    this.copyToClipBoard('Lotto Statistics', obj).subscribe((res) => {
-      if (res) {
-        this.getLottoDigitStatistics(newData);
-      }
-    });
-  }
-
-  private removeDuplicates(data) {
-    return data.reduce((unique, item) => {
-      const index = unique.findIndex((s) => s.date === item.date);
-      if (index !== -1) {
-        unique[index] = {...unique[index], ...item};
-        return unique;
-      }
-      return [...unique, item];
-    }, []);
-  }
-
-  getLottoDigitStatistics(newData: any[] = ParsedLottoJSON) {
-    const digitStatistics: LottoDigitStatistics = {
-      numbersMidday: [],
-      numbersEvening: [],
-      win4Midday: [],
-      win4Evening: []
-    };
-
-    const setData = (number, lottoDigits) => {
-      if (number != null) {
-        number.split('').forEach((digit, index) => {
-          const found = lottoDigits.find((h) => h.digit === digit && h.index === index);
-          if (found) {
-            found.count++;
-          } else {
-            lottoDigits.push({ digit, index, count: 1 });
-          }
-        });
-      }
-    };
-    newData.forEach((event) => {
-      setData(event.numbersMidday, digitStatistics.numbersMidday);
-      setData(event.numbersEvening, digitStatistics.numbersEvening);
-      setData(event.win4Midday, digitStatistics.win4Midday);
-      setData(event.win4Evening, digitStatistics.win4Evening);
-    });
-    digitStatistics.numbersMidday.sort((a, b) => b.count - a.count);
-    digitStatistics.numbersEvening.sort((a, b) => b.count - a.count);
-    digitStatistics.win4Midday.sort((a, b) => b.count - a.count);
-    digitStatistics.win4Evening.sort((a, b) => b.count - a.count);
-
-    this.copyToClipBoard('Lotto Digit Statistics', digitStatistics).subscribe();
   }
 
   getPredictions(predictionType: number): LottoStatistics {

@@ -58,18 +58,6 @@ export class LottoCalendarComponent implements OnInit, OnDestroy, AfterViewInit 
   ngAfterViewInit() {
   }
 
-  getLatest() {
-    this.lottoData.getLatestLottoData();
-  }
-
-  getStatistics() {
-    this.lottoData.getLottoStatistics();
-  }
-
-  getDigitStatistics() {
-    this.lottoData.getLottoDigitStatistics();
-  }
-
   createForms() {
     this.lottoSearchGroup = this.fb.group({
       number: this.fb.control(null),
@@ -131,7 +119,7 @@ export class LottoCalendarComponent implements OnInit, OnDestroy, AfterViewInit 
     this.predictionType = predictionType;
     if (!this.allPredictionResults[predictionType]) {
       this.allPredictionResults[predictionType] = this.lottoData.getPredictions(predictionType);
-    } 
+    }
     this.predictionResults = this.allPredictionResults[predictionType];
   }
 
