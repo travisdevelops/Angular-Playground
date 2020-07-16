@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "start": "ng serve",
-    "build": "ng build --prod --base-href ./ && git add . && git commit -m Deployment && git push && git pull && ngh --message='Site Deployment'"
+    "build": "ng build --prod --base-href ./ && git add . && git commit -m Deployment && git push && git pull && ngh -m=Deployment"
   },
   "private": true,
   "dependencies": {
