@@ -3,5 +3,5 @@
 View at 
 [GitHub Pages](https://travisdevelops.github.io/Angular-Playground)
 
-Also at
+Also
 https://tinyurl.com/travislotto
