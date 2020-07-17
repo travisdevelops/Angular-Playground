@@ -35,6 +35,7 @@ export class LottoCalendarComponent implements OnInit, OnDestroy, AfterViewInit 
   predictionResults = {};
   predictionType: number;
   protected env: any = environment;
+  private tester: any = false;
 
   get calendar() { return this.calendarComponent ? this.calendarComponent.calendar : null; }
 
