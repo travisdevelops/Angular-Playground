@@ -3,8 +3,11 @@
   "compilerOptions": {
     "baseUrl": "./src",
     "paths": {
-      "@app/*": ["app/*"],
-      "@classes/*": ["app/classes/*"]
+      "@shared/*": ["app/modules/shared/*"],
+      "@core/*": ["app/modules/core/*"],
+      "@connection/*": ["app/modules/connection/*"],
+      "@emitter/*": ["app/modules/emitter/*"],
+      "@swarm/*": ["app/modules/swarm/*"],
     },
     "outDir": "./dist/out-tsc",
     "sourceMap": true,
@@ -22,7 +25,6 @@
       "es2018",
       "dom"
     ],
-    "resolveJsonModule": true, 
     "esModuleInterop": true
   }
 }

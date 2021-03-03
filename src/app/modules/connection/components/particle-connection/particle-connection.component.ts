@@ -1,8 +1,8 @@
 import {Component, OnInit, OnDestroy} from '@angular/core';
 import {Particle} from '../../classes/particle';
-import {Vector} from '@classes/vector';
-import {Theme} from '@classes/theme';
-import {Sketch} from '@classes/sketch';
+import {Vector} from '@shared/classes/vector';
+import {Theme} from '@shared/classes/theme';
+import {Sketch} from '@shared/classes/sketch';
 import p5 from 'p5';
 
 @Component({

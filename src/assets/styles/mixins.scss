@@ -17,27 +17,3 @@
     }
   }
 }
-
-/* @include breakpoints(tablet-wide) { padding-top: 4rem;} */
-@mixin breakpoints($width, $type: min) {
-    @if map_has_key($breakpoints, $width) {
-        $width: map_get($breakpoints, $width);
-        @if $type == max {
-            $width: $width - 1px;
-        }
-        @media only screen and (#{$type}-width: $width) {
-            @content;
-        }
-    }
-}
-
-/* @include prefixes((  transition: all 0.3s ease, transform: translateX(90px)  )) */
-@mixin prefixes($declarations) {
-  @each $property, $value in $declarations {
-    $property-prefixes : map-get($prefixes, $property);
-    @each $prefix in $property-prefixes {
-      #{'-' + $prefix + '-' + $property}: $value;
-    }
-    #{$property}: $value;
-  }
-}

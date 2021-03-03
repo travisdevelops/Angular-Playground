@@ -1,6 +1,6 @@
-import {Vector} from '@classes/vector';
-import {Helper} from '@classes/helper';
-import {CanvasObject} from '@classes/canvas-object';
+import {Vector} from '@shared/classes/vector';
+import {Helper} from '@shared/classes/helper';
+import {CanvasObject} from '@shared/classes/canvas-object';
 import {EmitterParticle} from './emitter-particle';
 
 export class Emitter extends CanvasObject {

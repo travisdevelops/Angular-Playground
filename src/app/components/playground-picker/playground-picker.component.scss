@@ -1,8 +1,0 @@
-@import '../../../../src/styles';
-
-
-.modal-content {
-    @include themes() {
-        background-color: theme(backgroundColor);
-      }
-}

@@ -1,6 +1,6 @@
 import {Component, ComponentFactoryResolver, ViewChild, ViewContainerRef} from '@angular/core';
-import { PlaygroundPickerComponent } from './components/playground-picker/playground-picker.component';
-import { Theme } from '@classes/theme';
+import { PlaygroundPickerComponent } from './modules/core/components/playground-picker/playground-picker.component';
+import { Theme } from '@shared/classes/theme';
 import { ModalComponent } from '@app/components/modal/modal.component';
 
 @Component({

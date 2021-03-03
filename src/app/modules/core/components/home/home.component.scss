@@ -1,0 +1,7 @@
+@import '../../../../src/styles';
+
+.text-theme{
+  @include themes() {
+    color: theme(textColor) !important;
+  }
+}

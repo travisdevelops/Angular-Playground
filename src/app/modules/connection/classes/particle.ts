@@ -1,7 +1,7 @@
-import {Vector} from '@classes/vector';
-import {Theme} from '@classes/theme';
-import {CanvasObject} from '@classes/canvas-object';
-import {Sketch} from '@classes/sketch';
+import {Vector} from '@shared/classes/vector';
+import {Theme} from '@shared/classes/theme';
+import {CanvasObject} from '@shared/classes/canvas-object';
+import {Sketch} from '@shared/classes/sketch';
 
 export class Particle extends CanvasObject {
 
