@@ -3,12 +3,12 @@ import {Core} from './core';
 import {Sketch} from '@shared/classes/sketch';
 
 export class CoreManager {
-
+  cores: Core[];
 
   constructor() {
     this.cores = [];
   }
-  public cores: Core[];
+  
 
   // Remove Strand From A Single Core
   static removeStrandFromCore(core, strandToRemove) {
@@ -43,7 +43,7 @@ export class CoreManager {
     }
     const size = new Vector({x: sizeX, y: sizeY});
     const position = new Vector({x: posX, y: posY});
-    this.cores.push(new Core({strandCount: strandCount, size: size, position: position, square: square}));
+    this.cores.push(new Core({strandCount, size, position, square}));
   }
 
   // Set Strand Core To The First Core That Its Not Outside Of or Teleport Back To Original Core If Outside All

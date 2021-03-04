@@ -1,4 +1,128 @@
-@import './assets/styles/functions.scss';
-@import './assets/styles/variables.scss';
-@import './assets/styles/mixins.scss';
-@import './assets/styles/global.scss';
+@import "./assets/styles/functions.scss";
+@import "./assets/styles/variables.scss";
+@import "./assets/styles/mixins.scss";
+@import "~bootstrap/dist/css/bootstrap.css";
+@import "~@fortawesome/fontawesome-free/css/all.min.css";
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+}
+
+.theme-text {
+    @include themes() {
+        color: theme(textColor);
+    }
+}
+
+.theme-button {
+    @include themes() {
+        color: theme(buttonTextHoverColor);
+        border-color: theme(buttonBGHoverColor);
+        background-color: theme(buttonBGHoverColor);
+    }
+
+    &:hover {
+        @include themes() {
+            color: theme(buttonTextHoverColor);
+            border-color: darken(theme(buttonBGHoverColor), 5%);
+            background-color: darken(theme(buttonBGHoverColor), 5%);
+        }
+    }
+}
+
+.theme-button-outline {
+    @include themes() {
+        color: theme(buttonTextColor);
+        border-color: theme(buttonTextColor);
+        background-color: theme(buttonBGColor);
+    }
+
+    &:hover {
+        @include themes() {
+            color: theme(buttonTextHoverColor);
+            border-color: theme(buttonBGHoverColor);
+            background-color: theme(buttonBGHoverColor);
+        }
+    }
+}
+
+.toggle {
+    margin: 0;
+
+    input {
+        display: none;
+    }
+
+    input:checked ~ span:not(.toggle-icon):after {
+        transform: translateX(26px);
+    }
+
+    span:not(.toggle-icon) {
+        position: relative;
+        width: 50px;
+        height: 24px;
+        display: inline-block;
+
+        &:before,
+        &:after {
+            content: "";
+            position: absolute;
+            cursor: pointer;
+        }
+
+        &:before {
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: color(darkgrey);
+            border-radius: 24px;
+            transition: 0.4s;
+            @include themes() {
+                background-color: theme(borderColor);
+            }
+        }
+
+        &:after {
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            border-radius: 50%;
+            transition: 0.4s;
+            @include themes() {
+                background-color: theme(backgroundColor);
+            }
+        }
+    }
+
+    .toggle-icon {
+        vertical-align: top;
+        height: 24px;
+        width: 16px;
+        font-size: 16px;
+
+        &:before {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+    }
+
+    .toggle-icon-left {
+        color: color(yellow);
+    }
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+.nowrap {
+    white-space: nowrap;
+}

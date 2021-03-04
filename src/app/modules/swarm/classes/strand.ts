@@ -8,19 +8,35 @@ export class Strand extends CanvasObject {
 
   constructor() {
     super();
-    this.color = new Vector({x: 188, y: 254, z: 0});
+    this.color = new Vector({
+      x: Math.floor(Sketch.p5.random(0, 255)),
+      y: Math.floor(Sketch.p5.random(0, 255)),
+      z: Math.floor(Sketch.p5.random(0, 255))
+    });
     this.maxSpeed = new Vector({x: 2, y: 2});
     this.minSpeed = new Vector({x: 0.5, y: 0.5});
     this.size = new Vector({x: 2, y: 2});
     this.position = new Vector({x: 0, y: 0});
     this.tails = [];
     this.tailMax = 15;
+    this.changeColor();
   }
 
   // Randomize Movements On A Random Interval That Continues To Change
   randomizeMovements() {
     this.randomizeSpeed();
-    setTimeout(this.randomizeMovements, Sketch.p5.random(200, 800));
+    setTimeout(() => {
+      this.randomizeMovements();
+    }, Sketch.p5.random(200, 800));
+  }
+
+  changeColor() {
+    this.color.x += Math.floor(Sketch.p5.random(-20, 20));
+    this.color.y += Math.floor(Sketch.p5.random(-20, 20));
+    this.color.z += Math.floor(Sketch.p5.random(-20, 20));
+    setTimeout(() => {
+      this.changeColor();
+    }, 300);
   }
 
   // Display Strand With Glow

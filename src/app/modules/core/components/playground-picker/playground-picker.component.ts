@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Theme } from '@shared/classes/theme';
 
 @Component({
@@ -9,11 +11,20 @@ import { Theme } from '@shared/classes/theme';
 export class PlaygroundPickerComponent implements OnInit {
   Theme: any;
 
-  constructor() {
+  constructor(private activeModal: NgbActiveModal, private router: Router) {
     this.Theme = Theme;
   }
 
   ngOnInit() {
+  }
+
+  dismiss(): void {
+    this.activeModal.dismiss();
+  }
+
+  navigate(url: string): void {
+    this.router.navigate([url]);
+    this.dismiss();
   }
 
 }

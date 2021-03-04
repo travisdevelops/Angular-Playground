@@ -27,13 +27,9 @@
               "src/assets"
             ],
             "styles": [
-              "node_modules/bootstrap/dist/css/bootstrap.min.css",
-              "src/styles.scss",
-              "src/assets/styles/calendar.scss"
+              "src/styles.scss"
             ],
             "scripts": [
-              "node_modules/jquery/dist/jquery.js",
-              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
               "node_modules/p5/lib/p5.js"
             ]
           },

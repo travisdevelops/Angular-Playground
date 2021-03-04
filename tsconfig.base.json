@@ -1,13 +1,13 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "baseUrl": "./src",
+    "baseUrl": "./",
     "paths": {
-      "@shared/*": ["app/modules/shared/*"],
-      "@core/*": ["app/modules/core/*"],
-      "@connection/*": ["app/modules/connection/*"],
-      "@emitter/*": ["app/modules/emitter/*"],
-      "@swarm/*": ["app/modules/swarm/*"],
+      "@shared/*": ["src/app/modules/shared/*"],
+      "@core/*": ["src/app/modules/core/*"],
+      "@connection/*": ["src/app/modules/connection/*"],
+      "@emitter/*": ["src/app/modules/emitter/*"],
+      "@swarm/*": ["src/app/modules/swarm/*"],
     },
     "outDir": "./dist/out-tsc",
     "sourceMap": true,

@@ -1,7 +1,7 @@
-@import '../../../../src/styles';
+@import '../../../../../styles';
 
 
-.modal-content {
+.picker-wrapper {
     @include themes() {
         background-color: theme(backgroundColor);
       }
