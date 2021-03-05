@@ -4,7 +4,7 @@
   "scripts": {
     "start": "ng serve",
     "build": "ng build",
-    "buildDeployGit": "ng build --prod --base-href ./ && git add . && git commit -m Deployment && git push && git pull && ngh -m Deployment"
+    "git-commit": "git add . && git commit -m 'Update Files' && git push"
   },
   "private": true,
   "dependencies": {
