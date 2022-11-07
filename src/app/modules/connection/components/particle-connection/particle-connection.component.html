@@ -1,8 +1,8 @@
 <div class="px-3 py-2">
   <p class="mt-0 mb-3">Try Moving The Mouse Around The Dots!</p>
   <label for="connection-length" class="pr-4">Connection Length:</label>
-  <input type="number" id="connection-length" name="connectionLength" [(ngModel)]="particleConnectionLength" />
+  <input type="number" id="connection-length" name="connectionLength" [value]="particleConnectionLength" />
   <label for="particle-count" class="pl-4">Particle Count:</label>
-  <input type="number" id="particle-count" name="particleCount" [(ngModel)]="particleCount" />
+  <input type="number" id="particle-count" name="particleCount" [value]="particleCount" />
 </div>
 <div id="canvas-container"></div>

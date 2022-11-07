@@ -43,7 +43,7 @@ export class SwarmComponent implements OnInit, OnDestroy {
 
         // Core Manager
         this.coreManager = new CoreManager();
-        this.coreManager.addCore({ sizeX: 150, sizeY: 30, posX: 200, posY: 500, strandCount: 15 });
+        this.coreManager.addCore({ sizeX: 150, sizeY: 30, posX: 200, posY: 70, strandCount: 15 });
         this.coreManager.addCore({ sizeX: 30, sizeY: 120, posX: 80, posY: 340, strandCount: 15 });
         this.coreManager.addCore({ sizeX: 150, posX: 325, posY: 275, strandCount: 40, square: false });
         this.coreManager.addCore({ sizeX: 40, posX: 500, posY: 100, strandCount: 10, square: false });

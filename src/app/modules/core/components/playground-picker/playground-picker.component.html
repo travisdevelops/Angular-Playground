@@ -23,7 +23,7 @@
         <span class="toggle-icon toggle-icon-left mr-2">
          <i class="fas fa-sun"></i>
         </span>
-        <input type="checkbox" id="toggler" (change)="Theme.toggle()" [(ngModel)]="Theme.darkThemeToggled">
+        <input type="checkbox" id="toggler" (change)="Theme.toggle()" [value]="Theme.darkThemeToggled">
         <span></span>
         <span class="toggle-icon toggle-icon-right ml-2">
           <i class="fas fa-moon theme-text"></i>
